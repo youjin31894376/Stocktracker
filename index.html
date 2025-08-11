@@ -2,77 +2,84 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>개인용 스윙 트래커 홈 · Holographic (Mobile)</title>
 
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- Pretendard -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" />
-    <!-- React 18 -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"
+    />
+
+    <!-- React 18 + Babel -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Firebase SDK (App, Auth, Firestore) -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-      import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-      import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-      // 🔧 네 프로젝트 설정 (그대로 사용)
-      const firebaseConfig = {
-        apiKey: "AIzaSyBmyHCDjElHWFruKUz1psMF_JlR8xXkdsc",
-        authDomain: "stock-tracker-c5203.firebaseapp.com",
-        projectId: "stock-tracker-c5203",
-        storageBucket: "stock-tracker-c5203.firebasestorage.app",
-        messagingSenderId: "653038109673",
-        appId: "1:653038109673:web:cc17abb3796a6d4dff0178",
-        measurementId: "G-JCT2JK3PP6"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-
-      // 오프라인 캐시(되면 좋고, 안돼도 무시)
-      enableIndexedDbPersistence(db).catch(() => {});
-
-      // 익명 로그인 보장
-      const userReady = new Promise((resolve) => {
-        onAuthStateChanged(auth, async (user) => {
-          if (!user) {
-            await signInAnonymously(auth).catch(() => {});
-          }
-          resolve(auth.currentUser);
-        });
-      });
-
-      // window로 노출해서 Babel 스크립트에서 접근 가능하게
-      window.__fb = { app, auth, db, userReady, getDoc, setDoc, doc };
-    </script>
+    <!-- ✅ Firebase (compat 버전: 브라우저 전역 firebase.* 로 사용) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <style>
-      :root { --bg:#fff; --text:#111827; --muted:#6b7280; --shadow:0 6px 20px rgba(0,0,0,.06); --stroke:#e5e7eb; --safe:env(safe-area-inset-bottom,0px); }
-      html,body{height:100%;}
-      body{font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:var(--text);font-size:.9rem;}
-      .glass-card{background:#fff;border:1px solid var(--stroke);border-radius:12px;box-shadow:var(--shadow);}
-      .glass-input,.glass-select,.glass-textarea{background:#f9fafb;border:1px solid #e5e7eb;color:var(--text);border-radius:10px;transition:.2s ease;font-size:16px;}
-      .glass-input:focus,.glass-select:focus,.glass-textarea:focus{outline:none;border-color:#93c5fd;box-shadow:0 0 0 3px rgba(147,197,253,.3);}
-      .holo-btn{position:relative;border-radius:12px;padding:10px 14px;color:#0b1220;font-weight:400;cursor:pointer;border:1px solid transparent;background:
-        linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.7)) padding-box,
-        conic-gradient(from 180deg at 50% 50%,#7c3aed,#06b6d4,#22d3ee,#f472b6,#7c3aed) border-box;
-        box-shadow:0 10px 24px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.7);transition:transform .15s ease, box-shadow .2s ease, background .3s ease;}
-      .holo-btn:hover{transform:translateY(-1px);}
-      .holo-btn:active{transform:translateY(1px);box-shadow:0 6px 16px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.8);}
-      .holo-btn::after{content:"";position:absolute;inset:0;border-radius:12px;background:linear-gradient(120deg,rgba(255,255,255,.8),rgba(255,255,255,0) 42%);transform:translateY(-60%);filter:blur(6px);opacity:.35;pointer-events:none;}
-      .glass-btn{border-radius:12px;padding:10px 12px;cursor:pointer;background:#f3f4f6;border:1px solid #e5e7eb;color:var(--text);font-size:.9rem;font-weight:400;transition:.2s ease;}
-      .glass-btn:hover{transform:translateY(-1px);}
-      .danger{color:#dc2626;border-color:#fecaca;}
-      table thead{color:#374151;font-weight:400;} table tbody{color:#111827;} .table-cell{border-top:1px solid #f1f5f9;} .muted{color:var(--muted);}
-      .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#fff;border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -10px 30px rgba(0,0,0,.12);transform:translateY(100%);transition:transform .25s ease;padding-bottom:calc(12px + var(--safe));}
-      .sheet.open{transform:translateY(0%);} .sheet-handle{width:40px;height:4px;border-radius:9999px;background:#e5e7eb;margin:8px auto 4px;}
-      .fab{position:fixed;right:16px;bottom:calc(16px + var(--safe));z-index:40;} .meta-label{font-size:12px;color:#6b7280;}
+      :root {
+        --bg: #ffffff;
+        --text: #111827;
+        --muted: #6b7280;
+        --shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        --stroke: #e5e7eb;
+        --safe: env(safe-area-inset-bottom, 0px);
+      }
+      html, body { height: 100%; }
+      body {
+        font-family: "Pretendard Variable", Pretendard, -apple-system,
+          BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo",
+          "Malgun Gothic", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+      .glass-card { background:#fff; border:1px solid var(--stroke); border-radius:12px; box-shadow:var(--shadow); }
+      .glass-input,.glass-select,.glass-textarea{
+        background:#f9fafb; border:1px solid #e5e7eb; color:var(--text); border-radius:10px; transition:.2s ease; font-size:16px;
+      }
+      .glass-input:focus,.glass-select:focus,.glass-textarea:focus{ outline:none; border-color:#93c5fd; box-shadow:0 0 0 3px rgba(147,197,253,.3); }
+      .holo-btn{
+        position:relative;border-radius:12px;padding:10px 14px;color:#0b1220;font-weight:400;cursor:pointer;border:1px solid transparent;
+        background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.7)) padding-box,
+          conic-gradient(from 180deg at 50% 50%,#7c3aed,#06b6d4,#22d3ee,#f472b6,#7c3aed) border-box;
+        box-shadow:0 10px 24px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.7);
+        transition:transform .15s ease, box-shadow .2s ease, background .3s ease;
+      }
+      .holo-btn:hover{ transform:translateY(-1px); }
+      .holo-btn:active{ transform:translateY(1px); box-shadow:0 6px 16px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.8); }
+      .holo-btn::after{
+        content:""; position:absolute; inset:0; border-radius:12px;
+        background:linear-gradient(120deg,rgba(255,255,255,.8),rgba(255,255,255,0) 42%);
+        transform:translateY(-60%); filter:blur(6px); opacity:.35; pointer-events:none;
+      }
+      .glass-btn{ border-radius:12px; padding:10px 12px; cursor:pointer; background:#f3f4f6; border:1px solid #e5e7eb; color:var(--text); font-size:.9rem; font-weight:400; transition:.2s ease; }
+      .glass-btn:hover{ transform:translateY(-1px); }
+      .danger{ color:#dc2626; border-color:#fecaca; }
+      table thead{ color:#374151; font-weight:400; }
+      table tbody{ color:#111827; }
+      .table-cell{ border-top:1px solid #f1f5f9; }
+      .muted{ color:var(--muted); }
+
+      /* 바텀시트 */
+      .sheet{ position:fixed; left:0; right:0; bottom:0; z-index:50; background:#fff;
+        border-top-left-radius:16px; border-top-right-radius:16px; box-shadow:0 -10px 30px rgba(0,0,0,.12);
+        transform:translateY(100%); transition:transform .25s ease; padding-bottom:calc(12px + var(--safe)); }
+      .sheet.open{ transform:translateY(0%); }
+      .sheet-handle{ width:40px; height:4px; border-radius:9999px; background:#e5e7eb; margin:8px auto 4px; }
+      .fab{ position:fixed; right:16px; bottom:calc(16px + var(--safe)); z-index:40; }
+      .meta-label{ font-size:12px; color:#6b7280; }
     </style>
   </head>
 
@@ -82,118 +89,73 @@
     <script type="text/babel">
       const { useState, useMemo, useEffect } = React;
 
-      /* ---------------------- 데이터/유틸 ---------------------- */
+      /* =========================
+         Firebase 초기화 (compat)
+      ==========================*/
+      const firebaseConfig = {
+        apiKey: "AIzaSyBmyHCDjElHWFruKUz1psMF_JlR8xXkdsc",
+        authDomain: "stock-tracker-c5203.firebaseapp.com",
+        projectId: "stock-tracker-c5203",
+        storageBucket: "stock-tracker-c5203.firebasestorage.app",
+        messagingSenderId: "653038109673",
+        appId: "1:653038109673:web:cc17abb3796a6d4dff0178",
+        measurementId: "G-JCT2JK3PP6"
+      };
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db   = firebase.firestore();
+
+      // 익명 로그인(최초 로딩 시 자동)
+      const userReady = new Promise((resolve) => {
+        auth.onAuthStateChanged(async (u) => {
+          if (u) return resolve(u);
+          try { await auth.signInAnonymously(); } catch(e){}
+        });
+        // 로그인 완료 콜백에서 resolve됨
+        auth.onAuthStateChanged((u)=> u && resolve(u));
+      });
+
+      /* ============ 기존 앱 상태 ============ */
       const APP_KEY = "swing-home-v2-mobile";
-      const STOCKS = [{key:"kakao",name:"카카오"},{key:"samsung",name:"삼성전자"},{key:"sm",name:"에스엠"}];
+      const STOCKS = [
+        { key: "kakao", name: "카카오" },
+        { key: "samsung", name: "삼성전자" },
+        { key: "sm", name: "에스엠" },
+      ];
 
       const defaultJournalEntry = () => ({
-        id: (crypto?.randomUUID?.() ?? String(Date.now()+Math.random())),
-        date: new Date().toISOString().slice(0,10),
-        side:"매수", qty:"", price:"", fees:"",
+        id: (crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random())),
+        date: new Date().toISOString().slice(0, 10),
+        side: "매수", qty:"", price:"", fees:"",
         plan:"", reason:"", target:"1% 절반 익절, 3~5% 연장", stop:"최대 -2%",
         emotion:3, outcome:"진행중", resultPct:"", resultPnl:"", hold:false,
         tags:"스윙", notes:""
       });
 
       const defaultState = {
-        settings:{ initialSeed:16000000 },
-        monthlyPnL:{},
-        journals:{ kakao:[], samsung:[], sm:[] }
+        settings: { initialSeed: 16000000 },
+        monthlyPnL: {},
+        journals: { kakao: [], samsung: [], sm: [] },
       };
 
-      const currency = (n)=> Number(n||0).toLocaleString();
-      const pct = (n)=> isFinite(n)? (Math.round(n*10)/10).toFixed(1):"0.0";
-
-      // 저장 과도 요청 방지용 디바운스
-      const debounce = (fn, ms=800) => {
-        let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
-      };
-
-      /* ---------------------- 로컬+클라우드 상태 훅 ---------------------- */
-      function useCloudedState(key, initial){
-        // 1) 우선 로컬
-        const [state, setState] = useState(()=>{
-          try{
+      function useLocalState(key, initial){
+        const [state, setState] = React.useState(() => {
+          try {
             const hash = new URLSearchParams(location.hash.replace(/^#/, "")).get("data");
             if (hash) return JSON.parse(atob(hash));
-          }catch{}
-          try{
+          } catch(e){}
+          try {
             const raw = localStorage.getItem(key);
             return raw? JSON.parse(raw): initial;
-          }catch{ return initial; }
+          } catch(e){ return initial; }
         });
-
-        // 로컬 저장
-        useEffect(()=>{ try{ localStorage.setItem(key, JSON.stringify(state)); }catch{} }, [key, state]);
-
-        // 2) 파이어베이스 동기화
-        useEffect(()=>{
-          let unsub;
-          (async ()=>{
-            try{
-              const fb = window.__fb;
-              if (!fb) return; // SDK 미초기화시 무시
-              const user = await fb.userReady;
-              if (!user) return;
-
-              const docRef = fb.doc(fb.db, "users", user.uid, "state", key);
-              // 최초 가져오기
-              const snap = await fb.getDoc(docRef);
-              if (snap.exists()){
-                const remote = snap.data();
-                // 최신(업데이트 시각) 기준 병합 (단순: remote 우선)
-                if (remote?.__updatedAt && (remote.__updatedAt >= (state.__updatedAt||0))){
-                  setState(remote);
-                }else{
-                  // 로컬이 최신이면 업로드
-                  await fb.setDoc(docRef, {...state, __updatedAt: Date.now()}, { merge:true });
-                }
-              }else{
-                // 문서가 없으면 업로드
-                await fb.setDoc(docRef, {...state, __updatedAt: Date.now()});
-              }
-
-              // 리스너 (다른 기기에서 변경되면 실시간 반영)
-              unsub = (await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js"))
-                .onSnapshot(docRef, (sn)=>{
-                  if (!sn.exists()) return;
-                  const d = sn.data();
-                  // 내 저장 루프와 충돌 방지: 더 최신만 반영
-                  if (d?.__updatedAt && d.__updatedAt > (state.__updatedAt||0)){
-                    setState(d);
-                  }
-                });
-
-              // 변경시 저장 (디바운스)
-              const save = debounce(async (next)=>{
-                try{
-                  await fb.setDoc(docRef, {...next, __updatedAt: Date.now()}, { merge:true });
-                }catch(e){}
-              }, 900);
-
-              // state 변경 감지 효과
-              const off = new MutationObserver(()=>{}); // dummy(참조 유지)
-              const stop = ()=> off.disconnect();
-              // 간단히 별도 effect로 구현
-              let prev = JSON.stringify(state);
-              const i = setInterval(()=>{
-                const cur = JSON.stringify(state);
-                if (cur !== prev){
-                  prev = cur;
-                  save(JSON.parse(cur));
-                }
-              }, 600);
-              // cleanup
-              return ()=>{ clearInterval(i); stop(); };
-            }catch(e){}
-          })();
-          return ()=>{ if (unsub) try{unsub();}catch{} };
-        }, []); // 초기 1회: 리스너 설치
-
+        useEffect(()=>{ try{ localStorage.setItem(key, JSON.stringify(state)); }catch(e){} }, [key, state]);
         return [state, setState];
       }
 
-      /* ---------------------- 공통 UI ---------------------- */
+      const currency = (n)=> Number(n||0).toLocaleString();
+      const pct = (n)=> isFinite(n)? (Math.round(n*10)/10).toFixed(1): "0.0";
+
       const Section = ({title, right, children}) => (
         <div className="glass-card p-4">
           <div className="flex items-center justify-between mb-3">
@@ -213,7 +175,7 @@
       );
 
       function MonthlyPnLTable({ monthly, onChange }){
-        const [year, setYear] = useState(new Date().getFullYear());
+        const [year, setYear] = React.useState(new Date().getFullYear());
         const months = Array.from({length:12}, (_,i)=>i+1);
         const ym = (y,m)=> `${y}-${String(m).padStart(2,"0")}`;
         return (
@@ -221,7 +183,7 @@
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs muted">연도</span>
               <select className="glass-select px-2 py-1" value={year} onChange={e=>setYear(Number(e.target.value))}>
-                {Array.from({length:6},(_,i)=>new Date().getFullYear()-3+i).map(y=><option key={y} value={y}>{y}</option>)}
+                {Array.from({length:6},(_,i)=>new Date().getFullYear()-3+i).map(y=> <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -231,8 +193,12 @@
                 return (
                   <div key={key} className="glass-card p-2">
                     <div className="text-xs muted mb-1">{year}년 {m}월</div>
-                    <input className="glass-input w-full px-3 py-2 text-right" placeholder="예: 140000" value={v}
-                      onChange={e=>onChange(key, e.target.value)} />
+                    <input
+                      className="glass-input w-full px-3 py-2 text-right"
+                      placeholder="예: 140000"
+                      value={v}
+                      onChange={e=>onChange(key, e.target.value)}
+                    />
                   </div>
                 );
               })}
@@ -253,59 +219,72 @@
                 <div className="text-sm muted">일지 입력 · {stock}</div>
                 <button className="glass-btn" onClick={()=>setEditing(null)}>닫기</button>
               </div>
-
               <div className="grid grid-cols-2 gap-3 mt-3">
-                <div><div className="text-xs muted mb-1">날짜</div>
-                  <input type="date" className="glass-input w-full px-3 py-2" value={entry.date} onChange={e=>update("date", e.target.value)}/>
+                <div className="col-span-1">
+                  <div className="text-xs muted mb-1">날짜</div>
+                  <input type="date" className="glass-input w/full px-3 py-2" value={entry.date} onChange={e=>update("date", e.target.value)}/>
                 </div>
-                <div><div className="text-xs muted mb-1">사이드</div>
+                <div className="col-span-1">
+                  <div className="text-xs muted mb-1">사이드</div>
                   <select className="glass-input w-full px-3 py-2" value={entry.side} onChange={e=>update("side", e.target.value)}>
                     <option>매수</option><option>매도</option><option>관망</option><option>청산</option>
                   </select>
                 </div>
-                <div><div className="text-xs muted mb-1">수량</div>
+                <div>
+                  <div className="text-xs muted mb-1">수량</div>
                   <input inputMode="numeric" pattern="[0-9]*" className="glass-input w-full px-3 py-2" value={entry.qty} onChange={e=>update("qty", e.target.value)}/>
                 </div>
-                <div><div className="text-xs muted mb-1">가격</div>
+                <div>
+                  <div className="text-xs muted mb-1">가격</div>
                   <input inputMode="decimal" className="glass-input w-full px-3 py-2" value={entry.price} onChange={e=>update("price", e.target.value)}/>
                 </div>
-                <div><div className="text-xs muted mb-1">수수료/세금</div>
+                <div>
+                  <div className="text-xs muted mb-1">수수료/세금</div>
                   <input inputMode="decimal" className="glass-input w-full px-3 py-2" value={entry.fees} onChange={e=>update("fees", e.target.value)}/>
                 </div>
-                <div><div className="text-xs muted mb-1">감정(1~5)</div>
+                <div>
+                  <div className="text-xs muted mb-1">감정(1~5)</div>
                   <input type="number" min="1" max="5" className="glass-input w-full px-3 py-2" value={entry.emotion} onChange={e=>update("emotion", e.target.value)}/>
                 </div>
-                <div className="col-span-2"><div className="text-xs muted mb-1">부분익절/목표</div>
+                <div className="col-span-2">
+                  <div className="text-xs muted mb-1">부분익절/목표</div>
                   <input className="glass-input w-full px-3 py-2" value={entry.target} onChange={e=>update("target", e.target.value)}/>
                 </div>
-                <div className="col-span-2"><div className="text-xs muted mb-1">리스크/손절</div>
+                <div className="col-span-2">
+                  <div className="text-xs muted mb-1">리스크/손절</div>
                   <input className="glass-input w-full px-3 py-2" value={entry.stop} onChange={e=>update("stop", e.target.value)}/>
                 </div>
-                <div className="col-span-2"><div className="text-xs muted mb-1">진입 계획(시나리오)</div>
+                <div className="col-span-2">
+                  <div className="text-xs muted mb-1">진입 계획(시나리오)</div>
                   <textarea rows="2" className="glass-input w-full px-3 py-2" value={entry.plan} onChange={e=>update("plan", e.target.value)}></textarea>
                 </div>
-                <div className="col-span-2"><div className="text-xs muted mb-1">실행/종료 이유</div>
+                <div className="col-span-2">
+                  <div className="text-xs muted mb-1">실행/종료 이유</div>
                   <textarea rows="2" className="glass-input w-full px-3 py-2" value={entry.reason} onChange={e=>update("reason", e.target.value)}></textarea>
                 </div>
-                <div><div className="text-xs muted mb-1">실현 수익률(%)</div>
+                <div>
+                  <div className="text-xs muted mb-1">실현 수익률(%)</div>
                   <input inputMode="decimal" className="glass-input w-full px-3 py-2" value={entry.resultPct} onChange={e=>update("resultPct", e.target.value)}/>
                 </div>
-                <div><div className="text-xs muted mb-1">실현 손익(₩)</div>
+                <div>
+                  <div className="text-xs muted mb-1">실현 손익(₩)</div>
                   <input inputMode="decimal" className="glass-input w-full px-3 py-2" value={entry.resultPnl} onChange={e=>update("resultPnl", e.target.value)}/>
                 </div>
-                <div><div className="text-xs muted mb-1">보유</div>
+                <div>
+                  <div className="text-xs muted mb-1">보유</div>
                   <select className="glass-input w-full px-3 py-2" value={entry.hold? "Y":"N"} onChange={e=>update("hold", e.target.value==="Y")}>
                     <option value="N">아니오</option><option value="Y">예</option>
                   </select>
                 </div>
-                <div><div className="text-xs muted mb-1">태그</div>
+                <div>
+                  <div className="text-xs muted mb-1">태그</div>
                   <input className="glass-input w-full px-3 py-2" value={entry.tags} onChange={e=>update("tags", e.target.value)}/>
                 </div>
-                <div className="col-span-2"><div className="text-xs muted mb-1">메모</div>
+                <div className="col-span-2">
+                  <div className="text-xs muted mb-1">메모</div>
                   <textarea rows="2" className="glass-input w-full px-3 py-2" value={entry.notes} onChange={e=>update("notes", e.target.value)}></textarea>
                 </div>
               </div>
-
               <div className="sticky bottom-0 bg-white pt-3 mt-3">
                 <div className="flex gap-2">
                   <button className="glass-btn flex-1" onClick={()=>setEditing(null)}>취소</button>
@@ -317,9 +296,19 @@
         );
       }
 
-      /* ---------------------- 메인 App ---------------------- */
+      /* ====== 클라우드 상태 표시 ====== */
+      function CloudStatus({ uid, savedAt }){
+        return (
+          <div className="text-xs muted">
+            <span className="mr-2">Cloud</span>
+            <span className="mr-2">UID: {uid? (uid.slice(0,8)+'…') : '로그인중…'}</span>
+            <span>저장: {savedAt? new Date(savedAt).toLocaleTimeString() : '대기'}</span>
+          </div>
+        );
+      }
+
       function App(){
-        const [state, setState] = useCloudedState(APP_KEY, defaultState);
+        const [state, setState] = useLocalState(APP_KEY, defaultState);
         const [tab, setTab] = useState("dashboard");
         const [stockTab, setStockTab] = useState(STOCKS[0].key);
         const [q, setQ] = useState("");
@@ -327,18 +316,58 @@
         const [sortDir, setSortDir] = useState("desc");
         const [editing, setEditing] = useState(null);
 
-        const realized = useMemo(()=>(
-          ["kakao","samsung","sm"]
+        // ✅ Firebase user / 클라우드 동기화
+        const [uid, setUid] = useState(null);
+        const [savedAt, setSavedAt] = useState(null);
+        const docRef = uid ? db.collection("swing-tracker").doc(uid) : null;
+
+        // 로그인 완료 후 uid 확보
+        useEffect(()=>{
+          userReady.then(u=> setUid(u.uid));
+        },[]);
+
+        // 최초 1회: 클라우드에서 불러오기 (있으면 로컬 상태를 덮어씀)
+        useEffect(()=>{
+          if(!docRef) return;
+          (async ()=>{
+            try {
+              const snap = await docRef.get();
+              if (snap.exists) {
+                const remote = snap.data();
+                // 최소한의 스키마 체크
+                if (remote && remote.monthlyPnL && remote.journals) {
+                  setState(remote);
+                }
+              }
+            } catch(e){ /* 무시 */ }
+          })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [uid]);
+
+        // 변경사항 -> 500ms 디바운스로 클라우드에 저장
+        useEffect(()=>{
+          if(!docRef) return;
+          const t = setTimeout(async ()=>{
+            try {
+              await docRef.set(state, { merge: true });
+              setSavedAt(Date.now());
+            } catch(e){ /* 오프라인이면 자동 실패, 다음 변경 때 재시도 */ }
+          }, 500);
+          return ()=> clearTimeout(t);
+        }, [state, docRef]);
+
+        const realized = useMemo(()=>{
+          return ["kakao","samsung","sm"]
             .flatMap(k=>state.journals[k])
-            .filter(e=>!e.hold && Number(e.resultPnl||0)!==0)
-        ), [state]);
+            .filter(e=>!e.hold && Number(e.resultPnl||0)!==0);
+        }, [state]);
 
         const totals = useMemo(()=>{
           const monthlyTotal = Object.values(state.monthlyPnL).reduce((s,v)=>s+Number(v||0),0);
           const pnl = realized.reduce((s,e)=>s+Number(e.resultPnl||0),0);
           const initialSeed = Number(state.settings?.initialSeed || 0);
           const currentSeed = initialSeed + pnl;
-          const roi = initialSeed>0 ? (pnl/initialSeed)*100 : 0;
+          const roi = initialSeed>0 ? (pnl / initialSeed) * 100 : 0;
           return { monthlyTotal, pnl, initialSeed, currentSeed, roi };
         }, [state, realized]);
 
@@ -357,20 +386,20 @@
         function editEntry(stock, id){ const e = state.journals[stock].find(x=>x.id===id); if (e) setEditing({ stock, entry: {...e} }); }
         function removeEntry(stock, id){
           if (!confirm("삭제할까요?")) return;
-          setState(prev=>({ ...prev, journals:{ ...prev.journals, [stock]: prev.journals[stock].filter(e=>e.id!==id) }}));
+          setState(prev=>({ ...prev, journals: { ...prev.journals, [stock]: prev.journals[stock].filter(e=>e.id!==id) }}));
         }
         function saveEntry(){
           const { stock, entry } = editing;
           setState(prev=>{
             const exists = prev.journals[stock].some(e=>e.id===entry.id);
             const next = exists ? prev.journals[stock].map(e=>e.id===entry.id? entry: e) : [entry, ...prev.journals[stock]];
-            return { ...prev, journals:{ ...prev.journals, [stock]: next }, __updatedAt: Date.now() };
+            return { ...prev, journals: { ...prev.journals, [stock]: next } };
           });
           setEditing(null);
         }
 
-        const setMonthly = (ym, value)=> setState(prev=>({ ...prev, monthlyPnL:{ ...prev.monthlyPnL, [ym]: value }, __updatedAt: Date.now() }));
-        const setInitialSeed = (v)=> setState(prev=>({ ...prev, settings:{ ...prev.settings, initialSeed: v }, __updatedAt: Date.now() }));
+        const setMonthly = (ym, value)=> setState(prev=>({ ...prev, monthlyPnL: { ...prev.monthlyPnL, [ym]: value }}));
+        const setInitialSeed = (v)=> setState(prev=>({ ...prev, settings:{ ...prev.settings, initialSeed: v }}));
 
         return (
           <div className="max-w-7xl mx-auto p-4 pb-24">
@@ -378,7 +407,7 @@
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-xl font-normal tracking-tight">개인용 스윙 트래커 홈</h1>
-                <p className="muted mt-1 text-sm">월 수익 집계 + 3종목(카카오·삼성전자·에스엠) 일지 · 로컬/클라우드 저장</p>
+                <p className="muted mt-1 text-sm">월 수익 집계 + 3종목(카카오·삼성전자·에스엠) 일지 · 로컬 저장 · Cloud 동기화</p>
               </div>
               <div className="flex gap-2">
                 <button className={`glass-btn ${tab==='dashboard' && 'ring-2 ring-blue-200'}`} onClick={()=>setTab('dashboard')}>대시보드</button>
@@ -408,11 +437,11 @@
                   </div>
                 </Section>
 
-                <Section title="가이드">
+                <Section title="가이드" right={<CloudStatus uid={uid} savedAt={savedAt}/>}>
                   <ul className="list-disc pl-5 text-xs muted space-y-1">
-                    <li>설정에서 <b>초기 시드</b>를 입력하면 대시보드의 현재 시드·수익률에 반영돼요.</li>
-                    <li>일지는 하단 <b>＋</b> 버튼(모바일)으로 빠르게 추가하세요.</li>
-                    <li>JSON 백업/복원 + Firebase 동기화로 안전하게 보관됩니다.</li>
+                    <li>설정에서 <b>초기 시드</b>를 입력하면 대시보드의 현재 시드·수익률에 반영됩니다.</li>
+                    <li>모바일에선 우하단 <b>＋</b> 버튼으로 빠르게 추가하세요.</li>
+                    <li>입력 내용은 <b>로컬 + Cloud</b>에 자동 저장됩니다.</li>
                   </ul>
                 </Section>
               </div>
@@ -443,7 +472,9 @@
                 <div className="overflow-auto rounded-xl border border-[#eef2f7] hidden md:block">
                   <table className="min-w-full text-sm">
                     <thead className="bg-[#f8fafc]">
-                      <tr>{['날짜','사이드','수량','가격','수수료','실현(%)','실현(₩)','보유','감정','태그','메모','작업'].map(h=> <th key={h} className="px-3 py-2 text-left whitespace-nowrap">{h}</th>)}</tr>
+                      <tr>
+                        {['날짜','사이드','수량','가격','수수료','실현(%)','실현(₩)','보유','감정','태그','메모','작업'].map(h=> <th key={h} className="px-3 py-2 text-left whitespace-nowrap">{h}</th>)}
+                      </tr>
                     </thead>
                     <tbody>
                       {filtered.map(e=> (
@@ -467,7 +498,9 @@
                           </td>
                         </tr>
                       ))}
-                      {filtered.length===0 && (<tr><td colSpan="12" className="px-3 py-10 text-center muted">기록이 없습니다. 우상단 “새 일지”.</td></tr>)}
+                      {filtered.length===0 && (
+                        <tr><td colSpan="12" className="px-3 py-10 text-center muted">기록이 없습니다. 우상단 “새 일지”.</td></tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -506,32 +539,46 @@
                 <Section title="초기 시드">
                   <div className="flex items-center gap-2">
                     <input inputMode="numeric" pattern="[0-9]*" className="glass-input w-48 px-3 py-2 text-right"
-                      value={state.settings.initialSeed}
-                      onChange={e=>{ const v = Number(String(e.target.value).replace(/[^0-9]/g,'')||0); setInitialSeed(v); }}/>
+                           value={state.settings.initialSeed}
+                           onChange={e=>{
+                             const v = Number(String(e.target.value).replace(/[^0-9]/g,'')||0);
+                             setInitialSeed(v);
+                           }}/>
                     <span className="text-sm">원</span>
                   </div>
                   <p className="text-xs muted mt-2">대시보드의 <b>현재 시드</b>와 <b>수익률</b> 계산에 사용됩니다.</p>
                 </Section>
 
-                <Section title="백업/복원 (JSON)">
+                <Section title="백업/복원">
                   <div className="flex flex-wrap gap-2">
                     <button className="glass-btn" onClick={()=>{
                       const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
-                      const url=URL.createObjectURL(blob); const a=document.createElement('a');
+                      const url = URL.createObjectURL(blob); const a=document.createElement('a');
                       a.href=url; a.download=`swing-tracker-backup-${Date.now()}.json`; a.click(); URL.revokeObjectURL(url);
                     }}>JSON 백업</button>
                     <label className="glass-btn cursor-pointer">복원
                       <input type="file" accept="application/json" className="hidden" onChange={e=>{
                         const f=e.target.files?.[0]; if(!f) return;
-                        const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); data.__updatedAt=Date.now(); setState(data);}catch{ alert('형식 오류'); } }; r.readAsText(f);
+                        const r=new FileReader(); r.onload=()=>{ try{ const data=JSON.parse(r.result); setState(data);}catch{ alert('형식 오류'); } }; r.readAsText(f);
                       }}/>
                     </label>
                   </div>
-                  <p className="text-xs muted mt-2">* 데이터는 로컬과 Firebase 모두에 동기화됩니다.</p>
+                  <p className="text-xs muted mt-2">* 데이터는 브라우저와 Cloud에 저장됩니다.</p>
                 </Section>
 
-                <Section title="클라우드 동기화 상태">
-                  <CloudStatus />
+                <Section title="링크 만들기(프라이빗)">
+                  <p className="text-xs muted mb-2">상태를 URL 해시(#data=...)로 공유할 수 있어요.</p>
+                  <div className="flex gap-2">
+                    <button className="holo-btn" onClick={()=>{
+                      try{ const link = `${location.href.split('#')[0]}#data=${btoa(JSON.stringify(state))}`;
+                        navigator.clipboard.writeText(link); alert('링크를 복사했어요.');
+                      }catch(e){ alert('링크 생성 실패'); }
+                    }}>링크 복사</button>
+                    <button className="glass-btn" onClick={()=>{
+                      const link = `${location.href.split('#')[0]}#data=${btoa(JSON.stringify(state))}`;
+                      prompt('아래 링크를 복사하세요', link);
+                    }}>링크 보기</button>
+                  </div>
                 </Section>
               </div>
             )}
@@ -551,21 +598,7 @@
         );
       }
 
-      // 간단한 클라우드 상태 표시 컴포넌트
-      function CloudStatus(){
-        const fb = window.__fb;
-        const [uid, setUid] = useState(null);
-        useEffect(()=>{ (async()=>{ try{ const u = await fb?.userReady; setUid(u?.uid || null); }catch{} })(); },[]);
-        return (
-          <div className="text-sm">
-            <div className="mb-2">로그인: <span className="muted">{uid? '익명 ('+uid.slice(0,8)+'…)':'확인 중…'}</span></div>
-            <div className="muted">* 동일 기기/브라우저면 같은 익명 계정으로 이어져요.</div>
-          </div>
-        );
-      }
-
-      const rootEl = document.getElementById("root");
-      ReactDOM.createRoot(rootEl).render(<App/>);
+      ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
     </script>
   </body>
 </html>
