@@ -28,7 +28,6 @@
     body{
       font-family:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       color:var(--text);
-      /* holographic BG */
       background:
         radial-gradient(1000px 600px at 10% -10%, #bfe3ff 0%, transparent 60%),
         radial-gradient(900px 520px at 100% 20%, #ffe0f5 0%, transparent 55%),
@@ -45,7 +44,6 @@
       box-shadow: var(--shadow);
     }
     .muted{ color:var(--muted); }
-
     .pill{
       border-radius:12px;
       background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.78));
@@ -63,16 +61,18 @@
     }
     .holo-btn:hover{ transform:translateY(-1px); }
 
-    /* Deck: 한 카드만 중앙에 표시 */
+    /* Deck: 한 카드만 중앙 표시 */
     .deck-wrap{ position:relative; height:560px; }
     .deck-card{
       width: 360px; height: 520px;
-      position:absolute; left:50%; top:50%; transform: translate(-50%,-50%);
-      opacity:0; pointer-events:none; transition: opacity .25s ease, transform .35s cubic-bezier(.2,.7,.2,1);
+      position:absolute; left:50%; top:50%;
+      transform: translate(-50%,-50%) scale(.96);
+      opacity:.0; pointer-events:none;
+      transition: opacity .25s ease, transform .35s cubic-bezier(.2,.7,.2,1);
     }
-    .deck-card.active{ opacity:1; pointer-events:auto; transform: translate(-50%,-50%) scale(1); }
-    .deck-card.prev{ transform: translate(calc(-50% - 40px),-50%) scale(.96); }
-    .deck-card.next{ transform: translate(calc(-50% + 40px),-50%) scale(.96); }
+    .deck-card.active{ opacity:1; transform: translate(-50%,-50%) scale(1); pointer-events:auto; }
+    .deck-card.prev{ opacity:.25; transform: translate(calc(-50% - 40px),-50%) scale(.94); }
+    .deck-card.next{ opacity:.25; transform: translate(calc(-50% + 40px),-50%) scale(.94); }
 
     /* Round glass nav */
     .nav-btn{
@@ -86,8 +86,8 @@
       -webkit-backdrop-filter: blur(10px) saturate(160%);
       box-shadow: var(--shadow); color:#334155;
     }
-    .nav-left{ left:-6px; }
-    .nav-right{ right:-6px; }
+    .nav-left{ left:10px; }
+    .nav-right{ right:10px; }
 
     .glass-input,.glass-select,.glass-textarea{
       background: rgba(255,255,255,.7);
@@ -101,11 +101,11 @@
       border-color:#cfe3ff;
     }
 
-    /* monthly grid 내부 스크롤바 숨김(투명) */
+    /* 내부 스크롤바 숨김 */
     .scroll-smooth{ -ms-overflow-style:none; scrollbar-width:none; }
     .scroll-smooth::-webkit-scrollbar{ width:0; height:0; background:transparent; }
 
-    /* stats 글자 안 잘림 */
+    /* stats */
     .stat .label{ font-size:12px; color:var(--muted); }
     .stat .value{ font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
@@ -120,7 +120,7 @@
     .sheet.open{ transform:translateY(0%); }
     .sheet-handle{ width:44px; height:5px; border-radius:9999px; background:#e5e7eb; margin:8px auto 6px; }
 
-    /* 상단 배경: cursive 서명 애니메이션 */
+    /* 서명 애니메이션 */
     .signature{
       position:absolute; left:40px; top:26px; pointer-events:none; z-index:0;
       opacity:.7; filter: drop-shadow(0 8px 24px rgba(0,0,0,.08));
@@ -135,7 +135,7 @@
   </style>
 </head>
 <body>
-  <!-- 서명 애니메이션 (배경) -->
+  <!-- 배경 서명 -->
   <svg class="signature" width="560" height="90" viewBox="0 0 560 90">
     <text x="0" y="62">stock tracker</text>
   </svg>
@@ -187,7 +187,6 @@
     );
 
     const CardFrame = ({title, right, children, status})=>{
-      // status: 'active' | 'prev' | 'next' (deck 애니메이션 클래스)
       return (
         <section className={`glass-card p-4 md:p-5 deck-card ${status||''}`}>
           <div className="flex items-center justify-between mb-3">
@@ -271,8 +270,8 @@
       )
     }
 
-    /* ---------- 각 카드 컨텐츠 ---------- */
-    function MonthlyCard({state, setMonthly}){
+    /* ---------- 카드 컨텐츠 ---------- */
+    function MonthlyCard({state, setMonthly, status}){
       const [year,setYear] = useState(new Date().getFullYear());
       const [editing,setEditing] = useState(false);
       const months = Array.from({length:12},(_,i)=>i+1);
@@ -283,6 +282,7 @@
       return (
         <CardFrame
           title="월별 실현 손익"
+          status={status}
           right={<button className="pill text-[13px]" onClick={()=>setEditing(v=>!v)}>{editing? '완료':'편집'}</button>}
         >
           <div className="flex items-center gap-2 mb-3">
@@ -314,9 +314,9 @@
       );
     }
 
-    function QuickAddCard({openNew}){
+    function QuickAddCard({openNew, status}){
       return (
-        <CardFrame title="새 일지">
+        <CardFrame title="새 일지" status={status}>
           <div className="flex flex-wrap gap-2">
             <button className="holo-btn" onClick={()=>openNew('kakao')}>카카오</button>
             <button className="holo-btn" onClick={()=>openNew('samsung')}>삼성전자</button>
@@ -327,9 +327,9 @@
       );
     }
 
-    function GuideCard(){
+    function GuideCard({status}){
       return (
-        <CardFrame title="가이드">
+        <CardFrame title="가이드" status={status}>
           <ul className="list-disc pl-5 text-sm muted space-y-1">
             <li>월별 금액은 <b>편집</b>을 눌러 입력해 두면 저장돼요.</li>
             <li>좌우 <b>&lt;</b>, <b>&gt;</b> 유리 버튼으로 카드 이동.</li>
@@ -340,7 +340,6 @@
       );
     }
 
-    /* 일지 탭 리스트(모바일 카드) */
     function JournalList({state, setState}){
       const [stockTab,setStockTab] = useState('kakao');
       const [q,setQ] = useState('');
@@ -391,14 +390,10 @@
           <div className="space-y-2">
             {filtered.map(e=>(
               <div key={e.id} className="border border-[#eef2f7] rounded-xl p-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">{e.date} · <span className="muted">{e.side}</span></div>
-                  {/* 모바일에서 숫자, 태그/감정은 숨김 → 표시 안함 */}
-                </div>
-                {/* 피드백만 보여줌 */}
+                <div className="text-sm">{e.date} · <span className="muted">{e.side}</span></div>
                 {e.feedback && <div className="mt-2 text-[13px] text-gray-700">{e.feedback}</div>}
                 <div className="mt-3 flex gap-2">
-                  <button className="pill" onClick={()=>alert('수정은 “대시보드 > 새 일지”에서 저장 시 덮어쓰기 방식으로 간단 지원합니다. 필요하면 수정기능 따로 붙일게요!')}>수정</button>
+                  <button className="pill" onclick="return false">수정</button>
                   <button className="pill" style="color:#dc2626;border-color:#fecaca" onClick={()=>removeEntry(e.id)}>삭제</button>
                 </div>
               </div>
@@ -414,9 +409,10 @@
       const [state,setState] = useLocalState(APP_KEY, defaultState);
       const [tab,setTab] = useState('dashboard');
       const [editing,setEditing] = useState(null);
-      const [index,setIndex] = useState(0); // deck index
+      const [index,setIndex] = useState(0); // 0:monthly,1:quick,2:guide
       const cards = ['monthly','quick','guide'];
       const go = dir => setIndex(i => (i+dir+cards.length)%cards.length);
+      const statusOf = i => (i===index?'active': ( (i=== (index+cards.length-1)%cards.length)?'prev': (i===(index+1)%cards.length)?'next':'' ));
 
       const setMonthly = (ym,value)=> setState(prev=>({...prev, monthlyPnL:{...prev.monthlyPnL,[ym]:value}}));
       const openNew = stock => setEditing({stock, entry: defaultEntry()});
@@ -447,33 +443,14 @@
           {tab==='dashboard' && (
             <main className="max-w-7xl mx-auto px-5 pb-12">
               <div className="deck-wrap">
-                {/* 좌우 버튼 */}
-                <button className="nav-btn nav-left hidden md:flex" aria-label="left" onClick={()=>go(-1)}>&lt;</button>
-                <button className="nav-btn nav-right hidden md:flex" aria-label="right" onClick={()=>go(1)}>&gt;</button>
+                {/* 좌우 버튼(모바일/데스크톱 모두 표시) */}
+                <button className="nav-btn nav-left" aria-label="left" onClick={()=>go(-1)}>&lt;</button>
+                <button className="nav-btn nav-right" aria-label="right" onClick={()=>go(1)}>&gt;</button>
 
-                {/* 카드 3개, 한 장만 활성 */}
-                <div className={(index===0)?'':'hidden md:block'}>
-                  <MonthlyCard state={state} setMonthly={setMonthly}/>
-                </div>
-                <div className={(index===1)?'':'hidden md:block'}>
-                  <QuickAddCard openNew={openNew}/>
-                </div>
-                <div className={(index===2)?'':'hidden md:block'}>
-                  <GuideCard/>
-                </div>
-
-                {/* md 이상에서 주변 카드 살짝 보이게 - 클래스만 부여 */}
-                <div className="hidden md:block">
-                  <MonthlyCard state={state} setMonthly={setMonthly}/>
-                </div>
-                <div className="hidden md:block">
-                  <QuickAddCard openNew={openNew}/>
-                </div>
-                <div className="hidden md:block">
-                  <GuideCard/>
-                </div>
-
-                <script type="text/babel" data-presets="react"></script>
+                {/* 3장의 카드 - 상태로 제어 */}
+                <MonthlyCard state={state} setMonthly={setMonthly} status={statusOf(0)}/>
+                <QuickAddCard openNew={openNew} status={statusOf(1)}/>
+                <GuideCard status={statusOf(2)}/>
               </div>
             </main>
           )}
