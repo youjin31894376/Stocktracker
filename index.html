@@ -2,493 +2,639 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>stock tracker · Holographic</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Pretendard -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
 
-  <!-- React 18 -->
+  <!-- Cursive Title Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <!-- React 18 + Babel -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
     :root{
-      --stroke: rgba(255,255,255,.55);
-      --muted:#6b7280;
+      --bg1:#f1f5ff;
+      --bg2:#f9fbff;
+      --halo1:#c7e8ff;
+      --halo2:#ffd6f0;
       --text:#0f172a;
-      --shadow: 0 10px 24px rgba(15, 23, 42, .12);
-      --soft: 0 6px 16px rgba(15, 23, 42, .10);
-      --safe: env(safe-area-inset-bottom, 0px);
+      --muted:#6b7280;
+      --stroke:#e5e7eb;
+      --shadow:0 10px 30px rgba(2, 6, 23, .08);
     }
-    html,body{height:100%}
+    html, body { height:100%; }
     body{
-      font-family:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
       color:var(--text);
       background:
-        radial-gradient(1000px 600px at 10% -10%, #bfe3ff 0%, transparent 60%),
-        radial-gradient(900px 520px at 100% 20%, #ffe0f5 0%, transparent 55%),
-        radial-gradient(700px 520px at 40% 110%, #d9ffef 0%, transparent 50%),
-        linear-gradient(180deg, #f7fbff, #eef0ff 60%, #fff0fb);
-      overflow-x:hidden;
+        radial-gradient(600px 300px at 7% 4%, var(--halo1), transparent 60%),
+        radial-gradient(500px 300px at 95% 9%, var(--halo2), transparent 55%),
+        linear-gradient(180deg, var(--bg2), #f4f6ff 55%, #f8f2ff 100%);
     }
-    .glass-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.55));
-      backdrop-filter: blur(16px) saturate(140%);
-      -webkit-backdrop-filter: blur(16px) saturate(140%);
-      border:1px solid var(--stroke);
-      border-radius:18px;
+
+    /* 유리 카드 */
+    .glass {
+      background: rgba(255,255,255,.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border:1px solid rgba(255,255,255,.5);
+      border-radius: 18px;
       box-shadow: var(--shadow);
     }
-    .muted{ color:var(--muted); }
-    .pill{
-      border-radius:12px;
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.78));
-      border:1px solid rgba(255,255,255,.92);
-      padding:8px 12px; box-shadow: var(--soft);
-    }
+    .glass-soft { background: rgba(255,255,255,.58); }
+
+    /* 홀로 버튼 */
     .holo-btn{
-      position:relative; border-radius:14px; padding:10px 16px; cursor:pointer;
-      color:#0b1220; font-weight:600; border:1px solid transparent;
+      position:relative;
+      border-radius:14px;
+      padding:.55rem .9rem;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.78)) padding-box,
-        conic-gradient(from 160deg at 50% 50%, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
-      box-shadow:0 10px 22px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.7);
-      transition:transform .15s ease;
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.7)) padding-box,
+        conic-gradient(from 180deg, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
+      border:1px solid transparent;
+      color:#0b1220;
+      transition:.2s;
+      box-shadow: 0 10px 24px rgba(2, 6, 23, .07), inset 0 1px 0 rgba(255,255,255,.7);
     }
-    .holo-btn:hover{ transform:translateY(-1px); }
+    .holo-btn:hover{ transform: translateY(-1px); }
+    .holo-btn:active{ transform: translateY(1px); }
 
-    /* Deck: 한 카드만 중앙 표시 */
-    .deck-wrap{ position:relative; height:560px; }
-    .deck-card{
-      width: 360px; height: 520px;
-      position:absolute; left:50%; top:50%;
-      transform: translate(-50%,-50%) scale(.96);
-      opacity:.0; pointer-events:none;
-      transition: opacity .25s ease, transform .35s cubic-bezier(.2,.7,.2,1);
+    /* 캐러셀: 하나만 보이게 */
+    .deck {
+      position:relative;
+      height:min(620px, 70vh);
+      display:grid;
+      place-items:center;
+      overflow:visible;
     }
-    .deck-card.active{ opacity:1; transform: translate(-50%,-50%) scale(1); pointer-events:auto; }
-    .deck-card.prev{ opacity:.25; transform: translate(calc(-50% - 40px),-50%) scale(.94); }
-    .deck-card.next{ opacity:.25; transform: translate(calc(-50% + 40px),-50%) scale(.94); }
-
-    /* Round glass nav */
-    .nav-btn{
-      position:absolute; top:50%; transform:translateY(-50%);
-      width:46px; height:46px; z-index:20;
-      display:flex; align-items:center; justify-content:center;
-      border-radius:9999px; cursor:pointer; user-select:none;
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.7));
-      border:1px solid rgba(255,255,255,.95);
-      backdrop-filter: blur(10px) saturate(160%);
-      -webkit-backdrop-filter: blur(10px) saturate(160%);
-      box-shadow: var(--shadow); color:#334155;
+    .slide{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+      transform: scale(.96);
+      filter: blur(14px);
+      transition: opacity .35s ease, transform .35s ease, filter .35s ease, visibility .35s;
     }
-    .nav-left{ left:10px; }
-    .nav-right{ right:10px; }
-
-    .glass-input,.glass-select,.glass-textarea{
-      background: rgba(255,255,255,.7);
-      border:1px solid rgba(255,255,255,.95);
-      border-radius:12px;
-      padding:10px 12px;
-      outline:none; transition:.18s ease; box-shadow: var(--soft);
-    }
-    .glass-input:focus,.glass-select:focus,.glass-textarea:focus{
-      box-shadow:0 0 0 4px rgba(59,130,246,.15);
-      border-color:#cfe3ff;
+    .slide.active{
+      opacity:1;
+      visibility:visible;
+      pointer-events:auto;
+      transform: scale(1);
+      filter: blur(0);
+      z-index:3;
     }
 
-    /* 내부 스크롤바 숨김 */
-    .scroll-smooth{ -ms-overflow-style:none; scrollbar-width:none; }
-    .scroll-smooth::-webkit-scrollbar{ width:0; height:0; background:transparent; }
-
-    /* stats */
-    .stat .label{ font-size:12px; color:var(--muted); }
-    .stat .value{ font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
-    /* sheet */
-    .sheet{
-      position:fixed; left:0; right:0; bottom:0; z-index:50;
-      background:#fff; border-top-left-radius:16px; border-top-right-radius:16px;
-      box-shadow:0 -12px 28px rgba(15,23,42,.18);
-      transform:translateY(100%); transition:transform .25s ease;
-      padding-bottom:calc(12px + var(--safe));
+    /* 좌우 화살 */
+    .nav-fab{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:42px; height:42px;
+      display:grid; place-items:center;
+      border-radius:999px;
+      background: rgba(255,255,255,.9);
+      border:1px solid rgba(255,255,255,.7);
+      box-shadow: 0 8px 20px rgba(2,6,23,.08);
+      transition:.2s;
     }
-    .sheet.open{ transform:translateY(0%); }
-    .sheet-handle{ width:44px; height:5px; border-radius:9999px; background:#e5e7eb; margin:8px auto 6px; }
+    .nav-fab:hover{ transform:translateY(-50%) scale(1.05); }
+    .nav-left{ left:clamp(8px, 4vw, 80px);}
+    .nav-right{ right:clamp(8px, 4vw, 80px);}
 
-    /* 서명 애니메이션 */
-    .signature{
-      position:absolute; left:40px; top:26px; pointer-events:none; z-index:0;
-      opacity:.7; filter: drop-shadow(0 8px 24px rgba(0,0,0,.08));
+    /* 스크롤바 투명 */
+    *{
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.3) transparent;
     }
-    .signature text{
-      font-family: "Brush Script MT", "Pacifico", "Comic Sans MS", cursive;
-      font-size:64px; fill:transparent; stroke:#ffffff; stroke-width:1.2;
-      stroke-linecap:round; stroke-linejoin:round;
-      stroke-dasharray:1200; stroke-dashoffset:1200; animation:write 2.8s ease forwards 0.3s;
+    *::-webkit-scrollbar{ height:8px; width:8px; }
+    *::-webkit-scrollbar-track{ background: transparent; }
+    *::-webkit-scrollbar-thumb{
+      background: linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.3));
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.5);
     }
-    @keyframes write{ to{ stroke-dashoffset:0; } }
+
+    /* 상단 탭 */
+    .tab{ border-radius:12px; padding:.45rem .8rem; }
+    .tab.active{ box-shadow: inset 0 0 0 2px rgba(59,130,246,.25); }
+
+    /* 제목 cursive */
+    .brand{
+      font-family:"Great Vibes", cursive;
+      font-size: clamp(28px, 5vw, 42px);
+      line-height:1;
+      color:#0f172a;
+      text-shadow: 0 2px 10px rgba(255,255,255,.7);
+    }
+
+    .muted{ color:var(--muted); }
+    .chip{ background:#f3f4f6; border:1px solid var(--stroke); border-radius:12px; padding:.35rem .6rem; }
+    .cell{ background:#fff; border:1px solid #eef2f7; border-radius:14px; padding:.65rem .8rem; }
   </style>
 </head>
 <body>
-  <!-- 배경 서명 -->
-  <svg class="signature" width="560" height="90" viewBox="0 0 560 90">
-    <text x="0" y="62">stock tracker</text>
-  </svg>
-
-  <div id="root" class="relative z-10 min-h-screen"></div>
+  <div id="root" class="min-h-screen"></div>
 
   <script type="text/babel">
     const {useState,useMemo,useEffect} = React;
 
-    const APP_KEY = "swing-home-v5";
+    const APP_KEY = "swing-home-v3-holo";
     const STOCKS = [
-      { key:'kakao', name:'카카오' },
-      { key:'samsung', name:'삼성전자' },
-      { key:'sm', name:'에스엠' },
+      {key:"kakao", name:"카카오"},
+      {key:"samsung", name:"삼성전자"},
+      {key:"sm", name:"에스엠"},
     ];
-    const currency = n => Number(n||0).toLocaleString();
 
-    function useLocalState(key, initial){
-      const [state, setState] = useState(()=>{
-        try{ const raw=localStorage.getItem(key); return raw? JSON.parse(raw):initial; }
-        catch(e){ return initial; }
-      });
-      useEffect(()=>{ try{ localStorage.setItem(key, JSON.stringify(state)); }catch{} },[key,state]);
-      return [state,setState];
-    }
-
-    const defaultEntry = () => ({
-      id: (crypto?.randomUUID?.() || String(Date.now()+Math.random())),
+    const defaultJournal = ()=>({
+      id: (crypto?.randomUUID?.() ?? String(Date.now()+Math.random())),
       date: new Date().toISOString().slice(0,10),
       side: '매수',
       qty:'', price:'',
+      plan:'', reason:'',
+      target:'1% 절반 익절, 3~5% 연장',
+      stop:'최대 -2%',
+      // 변경: 수수료/감정 제거
       resultPct:'', resultPnl:'',
-      good:'', feedback:'',
-      hold:false, tags:'스윙'
+      hold:false, tags:'스윙',
+      good:'', // 잘한 점
+      feedback:'' // 피드백
     });
 
     const defaultState = {
-      settings: { initialSeed: 16000000 },
-      monthlyPnL: {},
-      journals: { kakao:[], samsung:[], sm:[] }
+      settings:{ initialSeed:16000000 },
+      monthlyPnL:{},
+      journals:{ kakao:[], samsung:[], sm:[] }
     };
 
-    /* ---------- 작은 UI들 ---------- */
-    const Stat = ({label,value}) => (
-      <div className="glass-card p-3 stat">
-        <div className="label">{label}</div>
-        <div className="value">{value}</div>
-      </div>
-    );
+    function useLocalState(key, initial){
+      const [state, setState] = useState(()=>{
+        try{
+          const hash = new URLSearchParams(location.hash.replace(/^#/,'')).get('data');
+          if(hash) return JSON.parse(atob(hash));
+        }catch(e){}
+        try{
+          const raw = localStorage.getItem(key);
+          return raw? JSON.parse(raw): initial;
+        }catch(e){ return initial; }
+      });
+      useEffect(()=>{ try{ localStorage.setItem(key, JSON.stringify(state)); }catch(e){} }, [state]);
+      return [state, setState];
+    }
 
-    const CardFrame = ({title, right, children, status})=>{
+    const currency = n => Number(n||0).toLocaleString();
+    const pct = n => isFinite(n)? (Math.round(n*10)/10).toFixed(1): '0.0';
+
+    /** 공통 섹션 래퍼 */
+    const Section = ({title, right, children, className=""})=>{
       return (
-        <section className={`glass-card p-4 md:p-5 deck-card ${status||''}`}>
+        <div className={"glass p-5 md:p-6 w-[min(760px,92vw)] "+className}>
           <div className="flex items-center justify-between mb-3">
-            <div className="font-semibold text-[15px] text-slate-800">{title}</div>
-            <div className="flex items-center gap-2">{right}</div>
+            <h3 className="font-medium text-[15px]">{title}</h3>
+            {right}
           </div>
-          <div className="h-[420px] overflow-auto pr-1 scroll-smooth">{children}</div>
-        </section>
+          {children}
+        </div>
       );
     };
 
-    function EditorSheet({ editing, setEditing, onSave }){
-      if(!editing) return null;
-      const { entry, stock } = editing;
-      const update = (k,v)=> setEditing(p=> ({...p, entry:{...p.entry, [k]:v}}));
+    /** 1) 월별 실현손익 */
+    function Monthly({state, setMonthly}){
+      const [year, setYear] = useState(new Date().getFullYear());
+      const months = Array.from({length:12}, (_,i)=> i+1);
+      const ym = (y,m)=> `${y}-${String(m).padStart(2,'0')}`;
+
+      const totals = useMemo(()=>{
+        const monthlyTotal = Object.values(state.monthlyPnL).reduce((s,v)=>s+Number(v||0),0);
+        return { monthlyTotal };
+      }, [state]);
+
       return (
-        <div className="sheet open">
-          <div className="sheet-handle"></div>
-          <div className="px-4 pt-1 pb-4">
-            <div className="flex items-center justify-between mb-2">
+        <Section title="월별 실현 손익" right={
+          <button className="chip text-[12px]">편집</button>
+        }>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs muted">연도</span>
+            <select className="chip text-xs" value={year} onChange={e=>setYear(Number(e.target.value))}>
+              {Array.from({length:6},(_,i)=> new Date().getFullYear()-3+i).map(y=> <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-[46vh] overflow-auto pr-1">
+            {months.map(m=>{
+              const key = ym(year, m);
+              const v = state.monthlyPnL[key] ?? '';
+              return (
+                <div key={key} className="cell">
+                  <div className="text-[11px] muted mb-1">{m}월</div>
+                  <input className="w-full chip text-right"
+                         placeholder="예: 140000"
+                         value={v}
+                         onChange={e=>setMonthly(key, e.target.value)}/>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+            <Stat label="월 합계" value={`${currency(totals.monthlyTotal)} 원`} />
+            <SeedStat />
+            <RoiStat />
+            <CountStat />
+          </div>
+        </Section>
+      );
+    }
+
+    /** 2) 새 일지 */
+    function QuickAdd({add}){
+      return (
+        <Section title="새 일지">
+          <div className="flex flex-wrap gap-2">
+            {STOCKS.map(s=>(
+              <button key={s.key} className="holo-btn" onClick={()=>add(s.key)}>{s.name}</button>
+            ))}
+          </div>
+          <p className="text-[12px] muted mt-3">버튼을 눌러 바로 일지 시트를 열 수 있어요.</p>
+        </Section>
+      );
+    }
+
+    /** 3) 가이드 */
+    function Guide(){
+      return (
+        <Section title="가이드">
+          <ul className="list-disc pl-5 text-[13px] space-y-1 muted">
+            <li>월별 금액은 편집을 눌러 입력해 두면 저장돼요.</li>
+            <li>좌우 〈, 〉 유리 버튼으로 카드 이동.</li>
+            <li>일지는 ‘잘한 점/피드백’으로 나눠 기록합니다.</li>
+            <li>모든 데이터는 이 기기에만 저장됩니다.</li>
+          </ul>
+        </Section>
+      );
+    }
+
+    /** 대시보드 하단 통계용 작은 컴포넌트들 (값은 전역에서 읽음) */
+    function SeedStat(){
+      const ctx = React.useContext(AppCtx);
+      const seed = ctx.totals.currentSeed;
+      return <Stat label="현재 시드" value={<span className="text-[15px] md:text-base">{currency(seed)} 원</span>} />;
+    }
+    function RoiStat(){
+      const ctx = React.useContext(AppCtx);
+      const roi = ctx.totals.roi;
+      return <Stat label="수익률" value={<span className="text-[15px] md:text-base">{pct(roi)} %</span>} />;
+    }
+    function CountStat(){
+      const ctx = React.useContext(AppCtx);
+      const cnt = ctx.count;
+      return <Stat label="총 일지 수" value={`${cnt} 건`} />;
+    }
+    const Stat = ({label, value})=>(
+      <div className="glass-soft p-3 rounded-xl">
+        <div className="text-[11px] muted">{label}</div>
+        <div className="text-[16px] md:text-lg font-medium">{value}</div>
+      </div>
+    );
+
+    /** 편집용 바텀 시트 */
+    function EditorSheet({editing, setEditing, onSave}){
+      if(!editing) return null;
+      const {entry, stock} = editing;
+      const upd = (k,v)=> setEditing(p=> ({...p, entry:{...p.entry, [k]:v}}));
+
+      return (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/30" onClick={()=>setEditing(null)}></div>
+          <div className="absolute left-0 right-0 bottom-0 glass p-4 rounded-t-2xl">
+            <div className="flex items-center justify-between">
               <div className="text-sm muted">일지 입력 · {stock}</div>
-              <button className="pill" onClick={()=>setEditing(null)}>닫기</button>
+              <button className="chip" onClick={()=>setEditing(null)}>닫기</button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
                 <div className="text-xs muted mb-1">날짜</div>
-                <input type="date" className="glass-input w-full" value={entry.date} onChange={e=>update('date', e.target.value)}/>
+                <input type="date" className="chip w-full" value={entry.date} onChange={e=>upd('date', e.target.value)}/>
               </div>
               <div>
                 <div className="text-xs muted mb-1">사이드</div>
-                <select className="glass-input w-full" value={entry.side} onChange={e=>update('side', e.target.value)}>
+                <select className="chip w-full" value={entry.side} onChange={e=>upd('side', e.target.value)}>
                   <option>매수</option><option>매도</option><option>관망</option><option>청산</option>
                 </select>
               </div>
 
               <div>
                 <div className="text-xs muted mb-1">수량</div>
-                <input className="glass-input w-full" value={entry.qty} onChange={e=>update('qty', e.target.value)} />
+                <input className="chip w-full" value={entry.qty} onChange={e=>upd('qty', e.target.value)}/>
               </div>
               <div>
                 <div className="text-xs muted mb-1">가격</div>
-                <input className="glass-input w-full" value={entry.price} onChange={e=>update('price', e.target.value)} />
+                <input className="chip w-full" value={entry.price} onChange={e=>upd('price', e.target.value)}/>
+              </div>
+
+              <div className="col-span-2">
+                <div className="text-xs muted mb-1">부분익절/목표</div>
+                <input className="chip w-full" value={entry.target} onChange={e=>upd('target', e.target.value)}/>
+              </div>
+              <div className="col-span-2">
+                <div className="text-xs muted mb-1">리스크/손절</div>
+                <input className="chip w-full" value={entry.stop} onChange={e=>upd('stop', e.target.value)}/>
+              </div>
+
+              <div className="col-span-2">
+                <div className="text-xs muted mb-1">진입 계획(시나리오)</div>
+                <textarea rows="2" className="chip w-full" value={entry.plan} onChange={e=>upd('plan', e.target.value)}/>
+              </div>
+
+              <div className="col-span-2">
+                <div className="text-xs muted mb-1">실행/종료 이유</div>
+                <textarea rows="2" className="chip w-full" value={entry.reason} onChange={e=>upd('reason', e.target.value)}/>
               </div>
 
               <div>
                 <div className="text-xs muted mb-1">실현 수익률(%)</div>
-                <input className="glass-input w-full" value={entry.resultPct} onChange={e=>update('resultPct', e.target.value)} />
+                <input className="chip w-full" value={entry.resultPct} onChange={e=>upd('resultPct', e.target.value)}/>
               </div>
               <div>
                 <div className="text-xs muted mb-1">실현 손익(₩)</div>
-                <input className="glass-input w-full" value={entry.resultPnl} onChange={e=>update('resultPnl', e.target.value)} />
-              </div>
-
-              <div className="col-span-2">
-                <div className="text-xs muted mb-1">잘한 점</div>
-                <textarea rows="2" className="glass-textarea w-full" value={entry.good} onChange={e=>update('good', e.target.value)}></textarea>
-              </div>
-              <div className="col-span-2">
-                <div className="text-xs muted mb-1">피드백</div>
-                <textarea rows="3" className="glass-textarea w-full" value={entry.feedback} onChange={e=>update('feedback', e.target.value)}></textarea>
+                <input className="chip w-full" value={entry.resultPnl} onChange={e=>upd('resultPnl', e.target.value)}/>
               </div>
 
               <div>
                 <div className="text-xs muted mb-1">보유</div>
-                <select className="glass-input w-full" value={entry.hold?'Y':'N'} onChange={e=>update('hold', e.target.value==='Y')}>
+                <select className="chip w-full" value={entry.hold? 'Y':'N'} onChange={e=>upd('hold', e.target.value==='Y')}>
                   <option value="N">아니오</option><option value="Y">예</option>
                 </select>
               </div>
               <div>
                 <div className="text-xs muted mb-1">태그</div>
-                <input className="glass-input w-full" value={entry.tags} onChange={e=>update('tags', e.target.value)} />
+                <input className="chip w-full" value={entry.tags} onChange={e=>upd('tags', e.target.value)}/>
+              </div>
+
+              <div className="col-span-2">
+                <div className="text-xs muted mb-1">잘한 점</div>
+                <textarea rows="2" className="chip w-full" value={entry.good} onChange={e=>upd('good', e.target.value)}/>
+              </div>
+
+              <div className="col-span-2">
+                <div className="text-xs muted mb-1">피드백</div>
+                <textarea rows="3" className="chip w-full" value={entry.feedback} onChange={e=>upd('feedback', e.target.value)}/>
               </div>
             </div>
 
-            <div className="pt-3">
-              <button className="holo-btn w-full" onClick={onSave}>저장</button>
+            <div className="mt-3 flex gap-2">
+              <button className="chip flex-1" onClick={()=>setEditing(null)}>취소</button>
+              <button className="holo-btn flex-1" onClick={onSave}>저장</button>
             </div>
           </div>
         </div>
-      )
-    }
-
-    /* ---------- 카드 컨텐츠 ---------- */
-    function MonthlyCard({state, setMonthly, status}){
-      const [year,setYear] = useState(new Date().getFullYear());
-      const [editing,setEditing] = useState(false);
-      const months = Array.from({length:12},(_,i)=>i+1);
-      const ym = (y,m)=>`${y}-${String(m).padStart(2,'0')}`;
-
-      const total = Object.values(state.monthlyPnL).reduce((s,v)=>s+Number(v||0),0);
-
-      return (
-        <CardFrame
-          title="월별 실현 손익"
-          status={status}
-          right={<button className="pill text-[13px]" onClick={()=>setEditing(v=>!v)}>{editing? '완료':'편집'}</button>}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs muted">연도</span>
-            <select className="glass-select text-[12px] py-[4px]" value={year} onChange={e=>setYear(Number(e.target.value))}>
-              {Array.from({length:6},(_,i)=>new Date().getFullYear()-3+i).map(y=><option key={y} value={y}>{y}</option>)}
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {months.map(m=>{
-              const key=ym(year,m); const v=state.monthlyPnL[key] ?? '';
-              return (
-                <div key={key} className="glass-card p-2">
-                  <div className="text-xs muted mb-1">{m}월</div>
-                  <input className="glass-input w-full text-right" placeholder="예: 140000" value={v} disabled={!editing} onChange={e=>setMonthly(key, e.target.value)} />
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
-            <Stat label="월 합계" value={`${currency(total)} 원`} />
-            <Stat label="현재 시드" value={`${currency(state.settings.initialSeed)} 원`} />
-            <Stat label="수익률" value={`0.0 %`} />
-            <Stat label="총 일지 수" value={`${['kakao','samsung','sm'].reduce((s,k)=>s+state.journals[k].length,0)} 건`} />
-          </div>
-        </CardFrame>
       );
     }
 
-    function QuickAddCard({openNew, status}){
+    /* 앱 컨텍스트: 통계 공유 */
+    const AppCtx = React.createContext({totals:{}, count:0});
+
+    function App(){
+      const [state, setState] = useLocalState(APP_KEY, defaultState);
+      const [tab, setTab] = useState('dashboard');
+      const [active, setActive] = useState(0); // 0:월별, 1:새일지, 2:가이드
+      const [stockTab, setStockTab] = useState(STOCKS[0].key);
+      const [editing, setEditing] = useState(null);
+
+      const realized = useMemo(()=>{
+        return Object.keys(state.journals).flatMap(k=> state.journals[k])
+               .filter(e=> !e.hold && Number(e.resultPnl||0)!==0);
+      }, [state]);
+
+      const totals = useMemo(()=>{
+        const pnl = realized.reduce((s,e)=> s + Number(e.resultPnl||0), 0);
+        const initialSeed = Number(state.settings?.initialSeed || 0);
+        const currentSeed = initialSeed + pnl;
+        const roi = initialSeed>0? (pnl/initialSeed)*100: 0;
+        return {pnl, initialSeed, currentSeed, roi};
+      }, [realized, state.settings]);
+
+      const count = useMemo(()=> Object.values(state.journals).reduce((s,a)=> s+a.length, 0), [state]);
+
+      const addEntry = (stock)=> setEditing({stock, entry: defaultJournal()});
+      const saveEntry = ()=>{
+        const {stock, entry} = editing;
+        setState(prev=>{
+          const exists = prev.journals[stock].some(e=> e.id===entry.id);
+          const next = exists? prev.journals[stock].map(e=> e.id===entry.id? entry: e) : [entry, ...prev.journals[stock]];
+          return {...prev, journals:{...prev.journals, [stock]: next}};
+        });
+        setEditing(null);
+      };
+
+      const setMonthly = (ym, v)=> setState(prev=> ({...prev, monthlyPnL:{...prev.monthlyPnL, [ym]: v}}));
+      const setInitialSeed = v => setState(prev=> ({...prev, settings:{...prev.settings, initialSeed:v}}));
+
+      const slides = [
+        <Monthly key="m" state={state} setMonthly={setMonthly} />,
+        <QuickAdd key="q" add={addEntry} />,
+        <Guide key="g" />
+      ];
+
       return (
-        <CardFrame title="새 일지" status={status}>
-          <div className="flex flex-wrap gap-2">
-            <button className="holo-btn" onClick={()=>openNew('kakao')}>카카오</button>
-            <button className="holo-btn" onClick={()=>openNew('samsung')}>삼성전자</button>
-            <button className="holo-btn" onClick={()=>openNew('sm')}>에스엠</button>
+        <AppCtx.Provider value={{totals, count}}>
+          <div className="max-w-7xl mx-auto px-4 pb-24">
+            {/* 헤더 */}
+            <div className="flex items-center justify-between pt-6">
+              <div>
+                <div className="brand">stock tracker</div>
+                <div className="muted text-xs mt-1">swing diary & monthly pnl · local only</div>
+              </div>
+              <div className="flex gap-2">
+                <button className={"chip tab "+(tab==='dashboard'?'active':'')} onClick={()=>setTab('dashboard')}>대시보드</button>
+                <button className={"chip tab "+(tab==='journal'?'active':'')} onClick={()=>setTab('journal')}>일지</button>
+                <button className={"chip tab "+(tab==='settings'?'active':'')} onClick={()=>setTab('settings')}>설정</button>
+              </div>
+            </div>
+
+            {/* 대시보드 캐러셀 */}
+            {tab==='dashboard' && (
+              <div className="relative mt-8 deck">
+                {slides.map((el, i)=>(
+                  <div key={i} className={"slide "+(active===i?'active':'')}>
+                    {el}
+                  </div>
+                ))}
+                <button className="nav-fab nav-left" onClick={()=>setActive((active+slides.length-1)%slides.length)}>&lt;</button>
+                <button className="nav-fab nav-right" onClick={()=>setActive((active+1)%slides.length)}>&gt;</button>
+              </div>
+            )}
+
+            {/* 일지 탭 */}
+            {tab==='journal' && <JournalPage state={state} setState={setState} stockTab={stockTab} setStockTab={setStockTab} onEdit={(id)=> {
+              const e = state.journals[stockTab].find(x=>x.id===id);
+              if(e) setEditing({stock:stockTab, entry:{...e}});
+            }} />}
+
+            {/* 설정 탭 */}
+            {tab==='settings' && (
+              <div className="grid md:grid-cols-2 gap-4 mt-8">
+                <Section title="초기 시드">
+                  <div className="flex items-center gap-2">
+                    <input className="chip w-48 text-right" value={state.settings.initialSeed}
+                           onChange={e=> setInitialSeed(Number(String(e.target.value).replace(/[^0-9]/g,'')||0))}/>
+                    <span className="text-sm">원</span>
+                  </div>
+                </Section>
+
+                <Section title="백업/복원">
+                  <div className="flex flex-wrap gap-2">
+                    <button className="chip" onClick={()=>{
+                      const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href=url; a.download=`swing-tracker-backup-${Date.now()}.json`; a.click();
+                      URL.revokeObjectURL(url);
+                    }}>JSON 백업</button>
+
+                    <label className="chip cursor-pointer">복원
+                      <input type="file" className="hidden" accept="application/json" onChange={e=>{
+                        const f=e.target.files?.[0]; if(!f) return;
+                        const r=new FileReader(); r.onload=()=>{
+                          try{ setState(JSON.parse(r.result)); }catch{ alert('형식 오류'); }
+                        }; r.readAsText(f);
+                      }}/>
+                    </label>
+                  </div>
+                </Section>
+              </div>
+            )}
+
+            <EditorSheet editing={editing} setEditing={setEditing} onSave={saveEntry}/>
           </div>
-          <p className="muted text-xs mt-3">버튼을 눌러 바로 일지 시트를 열 수 있어요.</p>
-        </CardFrame>
+        </AppCtx.Provider>
       );
     }
 
-    function GuideCard({status}){
-      return (
-        <CardFrame title="가이드" status={status}>
-          <ul className="list-disc pl-5 text-sm muted space-y-1">
-            <li>월별 금액은 <b>편집</b>을 눌러 입력해 두면 저장돼요.</li>
-            <li>좌우 <b>&lt;</b>, <b>&gt;</b> 유리 버튼으로 카드 이동.</li>
-            <li>일지는 ‘잘한 점/피드백’으로 나눠 기록합니다.</li>
-            <li>모든 데이터는 이 기기에만 저장됩니다.</li>
-          </ul>
-        </CardFrame>
-      );
-    }
-
-    function JournalList({state, setState}){
-      const [stockTab,setStockTab] = useState('kakao');
-      const [q,setQ] = useState('');
-      const [sortKey,setSortKey] = useState('date');
-      const [sortDir,setSortDir] = useState('desc');
+    /** 일지 목록 페이지 (모바일 카드에서 태그/감정/초록 숫자 숨김, 피드백만 보이기) */
+    function JournalPage({state,setState,stockTab,setStockTab,onEdit}){
+      const [q, setQ] = useState('');
+      const [sortKey, setSortKey] = useState('date');
+      const [sortDir, setSortDir] = useState('desc');
 
       const filtered = useMemo(()=>{
-        let arr = [...state.journals[stockTab]];
+        let arr=[...state.journals[stockTab]];
         if(q){
           const t=q.toLowerCase();
-          arr = arr.filter(e=>[e.date,e.side,e.good,e.feedback,e.tags].join(' ').toLowerCase().includes(t));
+          arr=arr.filter(e=> [e.date,e.side,e.plan,e.reason,e.notes,e.tags,e.good,e.feedback].join(' ').toLowerCase().includes(t));
         }
-        const dir = sortDir==='asc'?1:-1;
-        arr.sort((a,b)=>(a[sortKey]>b[sortKey]?dir:-dir));
+        const dir=(sortDir==='asc'?1:-1);
+        arr.sort((a,b)=> (a[sortKey]>b[sortKey]? dir:-dir));
         return arr;
-      }, [state,stockTab,q,sortKey,sortDir]);
+      }, [state, stockTab, q, sortKey, sortDir]);
 
       const removeEntry = (id)=>{
         if(!confirm('삭제할까요?')) return;
-        setState(prev=>({...prev, journals:{...prev.journals,[stockTab]:prev.journals[stockTab].filter(e=>e.id!==id)}}));
+        setState(prev=> ({...prev, journals:{...prev.journals, [stockTab]: prev.journals[stockTab].filter(e=>e.id!==id)}}));
       };
 
       return (
-        <div className="glass-card p-4">
+        <div className="glass p-4 mt-8">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div className="flex gap-2">
-              {[
-                {k:'kakao',n:'카카오'},
-                {k:'samsung',n:'삼성전자'},
-                {k:'sm',n:'에스엠'},
-              ].map(s=>(
-                <button key={s.k} className={`pill ${stockTab===s.k?'ring-2 ring-blue-200':''}`} onClick={()=>setStockTab(s.k)}>{s.n}</button>
+              {STOCKS.map(s=>(
+                <button key={s.key} className={"chip "+(stockTab===s.key?'ring-2 ring-blue-200':'')} onClick={()=>setStockTab(s.key)}>{s.name}</button>
               ))}
             </div>
             <div className="flex items-center gap-2">
-              <input className="glass-input w-[170px]" placeholder="검색" value={q} onChange={e=>setQ(e.target.value)}/>
-              <select className="glass-select" value={sortKey} onChange={e=>setSortKey(e.target.value)}>
+              <input className="chip w-[200px]" placeholder="검색" value={q} onChange={e=>setQ(e.target.value)}/>
+              <select className="chip" value={sortKey} onChange={e=>setSortKey(e.target.value)}>
                 <option value="date">날짜</option>
                 <option value="resultPnl">손익</option>
               </select>
-              <select className="glass-select" value={sortDir} onChange={e=>setSortDir(e.target.value)}>
+              <select className="chip" value={sortDir} onChange={e=>setSortDir(e.target.value)}>
                 <option value="desc">내림</option>
                 <option value="asc">오름</option>
               </select>
+              <button className="holo-btn" onClick={()=> onEdit(null) || alert('대시보드 > 새 일지에서 추가해주세요 😊')}>새 일지</button>
             </div>
           </div>
 
-          <div className="space-y-2">
+          {/* 모바일 카드 */}
+          <div className="space-y-2 md:hidden">
             {filtered.map(e=>(
-              <div key={e.id} className="border border-[#eef2f7] rounded-xl p-3">
-                <div className="text-sm">{e.date} · <span className="muted">{e.side}</span></div>
+              <div key={e.id} className="glass p-3 rounded-xl">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">{e.date} · <span className="muted">{e.side}</span></div>
+                  {/* 초록 숫자 숨김 */}
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 text-[13px]">
+                  <div><span className="muted text-[12px]">수량</span> {e.qty||'-'}</div>
+                  <div><span className="muted text-[12px]">가격</span> {e.price||'-'}</div>
+                  <div><span className="muted text-[12px]">실현(%)</span> {e.resultPct||'-'}</div>
+                  {/* 태그/감정 숨김 */}
+                </div>
+                {/* 피드백만 표시 */}
                 {e.feedback && <div className="mt-2 text-[13px] text-gray-700">{e.feedback}</div>}
                 <div className="mt-3 flex gap-2">
-                  <button className="pill" onclick="return false">수정</button>
-                  <button className="pill" style="color:#dc2626;border-color:#fecaca" onClick={()=>removeEntry(e.id)}>삭제</button>
+                  <button className="chip" onClick={()=>onEdit(e.id)}>수정</button>
+                  <button className="chip" style={{color:'#dc2626',borderColor:'#fecaca'}} onClick={()=>removeEntry(e.id)}>삭제</button>
                 </div>
               </div>
             ))}
-            {filtered.length===0 && <div className="text-center muted py-6 text-sm">기록이 없습니다.</div>}
+            {filtered.length===0 && <div className="text-center muted py-6 text-sm">아직 기록이 없어요.</div>}
+          </div>
+
+          {/* 데스크톱 테이블 */}
+          <div className="hidden md:block overflow-auto rounded-xl border border-[#eef2f7]">
+            <table className="min-w-full text-sm">
+              <thead className="bg-[#f8fafc]">
+                <tr>
+                  {['날짜','사이드','수량','가격','실현(%)','실현(₩)','보유','잘한 점','피드백','작업'].map(h=><th key={h} className="px-3 py-2 text-left whitespace-nowrap">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map(e=>(
+                  <tr key={e.id} className="hover:bg-[#fafafa]">
+                    <td className="px-3 py-2">{e.date}</td>
+                    <td className="px-3 py-2">{e.side}</td>
+                    <td className="px-3 py-2 text-right">{e.qty}</td>
+                    <td className="px-3 py-2 text-right">{e.price}</td>
+                    <td className="px-3 py-2 text-right">{e.resultPct}</td>
+                    <td className={"px-3 py-2 text-right "+(Number(e.resultPnl||0)>=0? 'text-emerald-600':'text-rose-600')}>{e.resultPnl}</td>
+                    <td className="px-3 py-2">{e.hold? '보유':'-'}</td>
+                    <td className="px-3 py-2 max-w-[280px] truncate" title={e.good}>{e.good}</td>
+                    <td className="px-3 py-2 max-w-[320px] truncate" title={e.feedback}>{e.feedback}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex gap-2">
+                        <button className="chip" onClick={()=>onEdit(e.id)}>수정</button>
+                        <button className="chip" style={{color:'#dc2626',borderColor:'#fecaca'}} onClick={()=>removeEntry(e.id)}>삭제</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length===0 && (
+                  <tr><td colSpan="10" className="px-3 py-10 text-center muted">기록이 없습니다.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       );
     }
 
-    /* ---------- 최상위 App ---------- */
-    function App(){
-      const [state,setState] = useLocalState(APP_KEY, defaultState);
-      const [tab,setTab] = useState('dashboard');
-      const [editing,setEditing] = useState(null);
-      const [index,setIndex] = useState(0); // 0:monthly,1:quick,2:guide
-      const cards = ['monthly','quick','guide'];
-      const go = dir => setIndex(i => (i+dir+cards.length)%cards.length);
-      const statusOf = i => (i===index?'active': ( (i=== (index+cards.length-1)%cards.length)?'prev': (i===(index+1)%cards.length)?'next':'' ));
-
-      const setMonthly = (ym,value)=> setState(prev=>({...prev, monthlyPnL:{...prev.monthlyPnL,[ym]:value}}));
-      const openNew = stock => setEditing({stock, entry: defaultEntry()});
-      const onSave = ()=>{
-        const {stock, entry} = editing;
-        setState(prev=>({...prev, journals:{...prev.journals,[stock]:[entry, ...prev.journals[stock]]}}));
-        setEditing(null); alert('저장했어요!');
-      };
-
-      return (
-        <div className="min-h-screen">
-          {/* Header */}
-          <header className="max-w-7xl mx-auto px-5 pt-8 pb-6 relative z-10">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight relative z-10">stock tracker</h1>
-                <p className="muted text-sm relative z-10">swing diary & monthly pnl · local only</p>
-              </div>
-              <div className="flex gap-2 relative z-10">
-                <button className={`pill ${tab==='dashboard'?'ring-2 ring-blue-200':''}`} onClick={()=>setTab('dashboard')}>대시보드</button>
-                <button className={`pill ${tab==='journal'?'ring-2 ring-blue-200':''}`} onClick={()=>setTab('journal')}>일지</button>
-                <button className={`pill ${tab==='settings'?'ring-2 ring-blue-200':''}`} onClick={()=>setTab('settings')}>설정</button>
-              </div>
-            </div>
-          </header>
-
-          {/* Dashboard */}
-          {tab==='dashboard' && (
-            <main className="max-w-7xl mx-auto px-5 pb-12">
-              <div className="deck-wrap">
-                {/* 좌우 버튼(모바일/데스크톱 모두 표시) */}
-                <button className="nav-btn nav-left" aria-label="left" onClick={()=>go(-1)}>&lt;</button>
-                <button className="nav-btn nav-right" aria-label="right" onClick={()=>go(1)}>&gt;</button>
-
-                {/* 3장의 카드 - 상태로 제어 */}
-                <MonthlyCard state={state} setMonthly={setMonthly} status={statusOf(0)}/>
-                <QuickAddCard openNew={openNew} status={statusOf(1)}/>
-                <GuideCard status={statusOf(2)}/>
-              </div>
-            </main>
-          )}
-
-          {/* Journal */}
-          {tab==='journal' && (
-            <main className="max-w-6xl mx-auto px-5 pb-16">
-              <JournalList state={state} setState={setState}/>
-            </main>
-          )}
-
-          {/* Settings */}
-          {tab==='settings' && (
-            <main className="max-w-5xl mx-auto px-5 pb-16">
-              <div className="glass-card p-5 max-w-xl">
-                <div className="font-semibold mb-3">초기 시드</div>
-                <div className="flex items-center gap-2">
-                  <input
-                    className="glass-input w-56 text-right"
-                    value={state.settings.initialSeed}
-                    onChange={(e)=>{
-                      const v = Number(String(e.target.value).replace(/[^0-9]/g,'')||0);
-                      setState(prev=>({...prev, settings:{...prev.settings, initialSeed:v}}));
-                    }}
-                  />
-                  <span className="text-sm">원</span>
-                </div>
-              </div>
-            </main>
-          )}
-
-          <EditorSheet editing={editing} setEditing={setEditing} onSave={onSave}/>
-          <footer className="pb-[calc(20px+var(--safe))]"></footer>
-        </div>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+    const root = document.getElementById('root');
+    ReactDOM.createRoot(root).render(<App/>);
   </script>
 </body>
 </html>
