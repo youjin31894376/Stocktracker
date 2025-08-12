@@ -11,10 +11,10 @@
   <!-- Pretendard -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
 
-  <!-- Cursive Title -->
+  <!-- Brand Font: Noto Serif Hentaigana -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hentaigana:wght@400&display=swap" rel="stylesheet">
 
   <!-- React 18 + Babel -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -33,15 +33,69 @@
     body{
       font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
       color:var(--text);
+      /* 더 부드럽게 이어지는 배경(중간 경계 제거) */
       background:
-        radial-gradient(600px 300px at 7% 4%, #c7e8ff, transparent 60%),
-        radial-gradient(520px 330px at 94% 10%, #ffd6f0, transparent 55%),
-        linear-gradient(180deg, var(--bg2), #f4f6ff 55%, #f8f2ff 100%);
+        radial-gradient(900px 520px at 12% -8%, #c9ecff99, transparent 60%),
+        radial-gradient(880px 580px at 96% 2%, #ffd6f099, transparent 58%),
+        radial-gradient(1200px 420px at 50% 85%, #e9d5ff4d, transparent 70%),
+        linear-gradient(180deg, var(--bg2) 0%, #f4f6ff 55%, #f8f2ff 100%);
+      overflow-x:hidden;
+    }
+    /* 아주 옅은 보정 밴드(경계 감춤) */
+    .bg-softband{
+      position:fixed; left:0; right:0; top:28vh; bottom:-10vh; z-index:-2; pointer-events:none;
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0) 0%,
+        rgba(248,244,255,.28) 35%,
+        rgba(248,244,255,.22) 65%,
+        rgba(255,255,255,0) 100%);
     }
 
-    /* 유리 카드 */
+    /* 애니메이티드 홀로 미스트 */
+    body::before, body::after{
+      content:""; position:fixed; inset:auto; z-index:-3; pointer-events:none;
+      width:1200px; height:1200px; border-radius:50%;
+      filter: blur(60px); opacity:.45; transform:translate(-30%, -30%);
+      background: radial-gradient(closest-side, #7c3aed55, transparent 60%),
+                  radial-gradient(closest-side, #22d3ee55, transparent 60%),
+                  radial-gradient(closest-side, #f472b655, transparent 60%);
+      animation: driftA 18s ease-in-out infinite alternate;
+    }
+    body::after{
+      width:1000px; height:1000px; right:-20vw; top:-10vh; left:auto;
+      transform:translate(30%, -20%);
+      background: radial-gradient(closest-side, #06b6d455, transparent 60%),
+                  radial-gradient(closest-side, #a78bfa55, transparent 60%),
+                  radial-gradient(closest-side, #60a5fa55, transparent 60%);
+      animation: driftB 22s ease-in-out infinite alternate;
+    }
+    @keyframes driftA{ from{transform:translate(-35%,-25%)} to{transform:translate(-20%,-35%)} }
+    @keyframes driftB{ from{transform:translate(25%,-15%)} to{transform:translate(35%,-25%)} }
+
+    /* 떠다니는 유리 버블 */
+    .bg-bubbles{ position:fixed; inset:0; pointer-events:none; z-index:-1; }
+    .bg-bubbles span{
+      position:absolute; display:block; width:220px; height:220px; border-radius:50%;
+      background: radial-gradient(60% 60% at 40% 40%, rgba(255,255,255,.75), rgba(255,255,255,.2) 60%, rgba(255,255,255,0) 70%) padding-box,
+                  radial-gradient(120% 120% at 70% 30%, #7dd3fc55, #e9d5ff55, #fecdd355) border-box;
+      border:1px solid rgba(255,255,255,.6); backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: float 14s ease-in-out infinite;
+      filter:saturate(1.2);
+    }
+    .bg-bubbles span:nth-child(1){ left:6%;  top:22%; width:260px; height:260px; animation-delay:-4s; }
+    .bg-bubbles span:nth-child(2){ left:78%; top:18%; width:200px; height:200px; animation-delay:-7s; }
+    .bg-bubbles span:nth-child(3){ left:12%; bottom:6%; width:240px; height:240px; animation-delay:-10s; }
+    .bg-bubbles span:nth-child(4){ right:10%; bottom:8%; width:180px; height:180px; animation-delay:-2s; }
+    @keyframes float{
+      0% { transform:translateY(0) translateX(0) scale(1); }
+      50% { transform:translateY(-20px) translateX(10px) scale(1.04); }
+      100% { transform:translateY(0) translateX(0) scale(1); }
+    }
+
+    /* glass cards */
     .glass {
-      background: rgba(255,255,255,.72);
+      background: rgba(255,255,255,.70);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border:1px solid rgba(255,255,255,.55);
@@ -50,22 +104,14 @@
     }
     .glass-soft { background: rgba(255,255,255,.58); border:1px solid rgba(255,255,255,.55); border-radius:14px; }
 
-    /* 홀로그램 보더 */
-    .holo-surface{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.75)) padding-box,
-        conic-gradient(from 180deg, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
-      border:1px solid transparent;
-    }
-
-    /* 탭 */
+    /* tabs */
     .tab{
       border-radius:12px; padding:.46rem .85rem; font-weight:500;
       transition:.2s;
       box-shadow: 0 8px 20px rgba(2,6,23,.07), inset 0 1px 0 rgba(255,255,255,.7);
       background:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.7);
     }
-    .tab.active{ /* 홀로그램 보더 */
+    .tab.active{
       background:
         linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.75)) padding-box,
         conic-gradient(from 180deg, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
@@ -73,22 +119,7 @@
     }
     .tab:hover{ transform: translateY(-1px); }
 
-    /* 유리 버튼 */
-    .holo-btn{
-      border-radius:14px;
-      padding:.55rem .9rem;
-      color:#0b1220;
-      transition:.2s;
-      box-shadow: 0 10px 24px rgba(2, 6, 23, .07), inset 0 1px 0 rgba(255,255,255,.7);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.75)) padding-box,
-        conic-gradient(from 180deg, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
-      border:1px solid transparent;
-    }
-    .holo-btn:hover{ transform: translateY(-1px); }
-    .holo-btn:active{ transform: translateY(1px); }
-
-    /* 캐러셀: 하나만 보이게 */
+    /* carousel */
     .deck{ position:relative; height:min(620px, 70vh); display:grid; place-items:center; overflow:visible; }
     .slide{
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
@@ -98,23 +129,24 @@
     }
     .slide.active{ opacity:1; visibility:visible; pointer-events:auto; transform: scale(1); filter: blur(0); z-index:3; }
 
-    /* 좌우 화살 – 유리알 */
+    /* arrows – 더 투명한 유리 */
     .nav-fab{
       position:absolute; top:50%; transform:translateY(-50%);
-      width:46px; height:46px; display:grid; place-items:center;
+      width:44px; height:44px; display:grid; place-items:center;
       border-radius:999px; z-index:20; cursor:pointer;
-      background: rgba(255,255,255,.45);
-      border:1px solid rgba(255,255,255,.75);
+      background: rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.38);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 12px 28px rgba(2,6,23,.10), inset 0 1px 0 rgba(255,255,255,.8);
-      transition: transform .18s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: 0 8px 20px rgba(2,6,23,.06);
+      color:#374151;
+      transition: transform .18s ease, background .2s ease, color .2s ease;
     }
-    .nav-fab:hover{ transform:translateY(-50%) scale(1.07); background: rgba(255,255,255,.6); }
+    .nav-fab:hover{ transform:translateY(-50%) scale(1.06); background: rgba(255,255,255,.30); color:#0f172a; }
     .nav-left{ left:clamp(8px, 4vw, 80px);}
     .nav-right{ right:clamp(8px, 4vw, 80px);}
 
-    /* 투명 스크롤바 */
+    /* scrollbar */
     *{ scrollbar-width:thin; scrollbar-color: rgba(255,255,255,.35) transparent; }
     *::-webkit-scrollbar{ height:8px; width:8px; }
     *::-webkit-scrollbar-track{ background: transparent; }
@@ -123,17 +155,85 @@
       border-radius: 999px; border:1px solid rgba(255,255,255,.6);
     }
 
-    .brand{ font-family:"Great Vibes", cursive; font-size: clamp(28px, 5vw, 42px); line-height:1; color:#0f172a; text-shadow: 0 2px 10px rgba(255,255,255,.7); }
+    /* Title + bigger subtitle (정렬감 강화) */
+    .brand{
+      font-family:"Noto Serif Hentaigana", serif;
+      font-size: clamp(32px, 6vw, 48px);
+      line-height:1.05;
+      letter-spacing:-0.01em;
+      word-spacing:-0.2ch;
+      color:#0f172a;
+      text-shadow: 0 2px 10px rgba(255,255,255,.7);
+    }
+    .subtitle{
+      font-size: clamp(14px, 2.2vw, 20px);   /* ▶ 부제목 크게 */
+      line-height:1.15;
+      margin-top:.35rem;
+      color:#374151;
+      letter-spacing: .01em;
+      word-spacing: .05ch;
+    }
+
     .muted{ color:var(--muted); }
     .chip{ background:#f3f4f6; border:1px solid var(--stroke); border-radius:12px; padding:.35rem .6rem; }
     .cell{ background:#fff; border:1px solid #eef2f7; border-radius:14px; padding:.65rem .8rem; }
   </style>
 </head>
 <body>
+  <!-- 부드러운 밴드(배경 경계 제거용) -->
+  <div class="bg-softband"></div>
+
+  <!-- floating bubbles -->
+  <div class="bg-bubbles">
+    <span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- Firebase (cloud sync) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmyHCDjElHWFruKUz1psMF_JlR8xXkdsc",
+      authDomain: "stock-tracker-c5203.firebaseapp.com",
+      projectId: "stock-tracker-c5203",
+      storageBucket: "stock-tracker-c5203.firebasestorage.app",
+      messagingSenderId: "653038109673",
+      appId: "1:653038109673:web:cc17abb3796a6d4dff0178",
+      measurementId: "G-JCT2JK3PP6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    enableIndexedDbPersistence(db).catch(()=>{});
+
+    const userReady = new Promise(resolve=>{
+      onAuthStateChanged(auth, async (user)=>{
+        try{ if(!user) await signInAnonymously(auth); resolve(auth.currentUser); }
+        catch{ resolve(null); }
+      });
+    });
+
+    async function loadCloud(){
+      const u = await userReady; if(!u) return null;
+      const ref = doc(db, "users", u.uid);
+      const snap = await getDoc(ref);
+      return snap.exists()? snap.data() : null;
+    }
+    async function saveCloud(state){
+      const u = await userReady; if(!u) return;
+      const ref = doc(db, "users", u.uid);
+      await setDoc(ref, { ...state, updatedAt: Date.now() }, { merge:true });
+    }
+    window.fb = { db, auth, userReady, loadCloud, saveCloud };
+  </script>
+
   <div id="root" class="min-h-screen"></div>
 
   <script type="text/babel">
-    const {useState,useMemo,useEffect} = React;
+    const {useState,useMemo,useEffect,useRef} = React;
 
     const APP_KEY = "swing-home-v3-holo";
     const STOCKS = [
@@ -162,39 +262,61 @@
     };
 
     function useLocalState(key, initial){
-      const [state, setState] = useState(()=>{
-        try{
-          const hash = new URLSearchParams(location.hash.replace(/^#/,'')).get('data');
-          if(hash) return JSON.parse(atob(hash));
-        }catch(e){}
-        try{
-          const raw = localStorage.getItem(key);
-          return raw? JSON.parse(raw): initial;
-        }catch(e){ return initial; }
-      });
-      useEffect(()=>{ try{ localStorage.setItem(key, JSON.stringify(state)); }catch(e){} }, [state]);
+      const [state, setState] = useState(initial);
+      const mounted = useRef(false);
+
+      useEffect(()=>{
+        (async ()=>{
+          try{
+            const raw = localStorage.getItem(key);
+            const local = raw ? JSON.parse(raw) : initial;
+            let base = local;
+            if(window.fb){
+              const cloud = await window.fb.loadCloud();
+              if(cloud && cloud.settings){
+                base = {
+                  settings: { ...local.settings, ...cloud.settings },
+                  monthlyPnL: { ...local.monthlyPnL, ...cloud.monthlyPnL },
+                  journals: cloud.journals ? cloud.journals : local.journals
+                };
+              }
+            }
+            setState(base);
+            mounted.current = true;
+          }catch{
+            setState(initial);
+            mounted.current = true;
+          }
+        })();
+      }, []);
+
+      useEffect(()=>{
+        if(!mounted.current) return;
+        try{ localStorage.setItem(key, JSON.stringify(state)); }catch{};
+        const t = setTimeout(()=>{ window.fb?.saveCloud(state); }, 600);
+        return ()=> clearTimeout(t);
+      }, [state]);
+
       return [state, setState];
     }
 
     const currency = n => Number(n||0).toLocaleString();
     const pct = n => isFinite(n)? (Math.round(n*10)/10).toFixed(1): '0.0';
 
-    const Section = ({title, right, children, className=""})=>{
-      return (
-        <div className={"glass p-5 md:p-6 w-[min(760px,92vw)] "+className}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-[15px]">{title}</h3>
-            {right}
-          </div>
-          {children}
+    const Section = ({title, right, children, className=""})=>(
+      <div className={"glass p-5 md:p-6 w-[min(760px,92vw)] "+className}>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-medium text-[15px]">{title}</h3>
+          {right}
         </div>
-      );
-    };
+        {children}
+      </div>
+    );
 
     const AppCtx = React.createContext({totals:{}, count:0});
     const Stat = ({label, value})=>(
       <div className="glass-soft p-3 rounded-xl">
-        <div className="text-[11px] muted">{label}</div>
+        <div className="text-[11px] text-gray-500">{label}</div>
         <div className="text-[15px] md:text-base font-medium">{value}</div>
       </div>
     );
@@ -213,9 +335,9 @@
       }, [state]);
 
       return (
-        <Section title="월별 실현 손익" right={<button className="chip text-[12px]">편집</button>}>
+        <Section title="월별 실현 손익" right={<span className="chip text-[12px]">편집</span>}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs muted">연도</span>
+            <span className="text-xs text-gray-500">연도</span>
             <select className="chip text-xs" value={year} onChange={e=>setYear(Number(e.target.value))}>
               {Array.from({length:6},(_,i)=> new Date().getFullYear()-3+i).map(y=> <option key={y} value={y}>{y}</option>)}
             </select>
@@ -227,7 +349,7 @@
               const v = state.monthlyPnL[key] ?? '';
               return (
                 <div key={key} className="cell">
-                  <div className="text-[11px] muted mb-1">{m}월</div>
+                  <div className="text-[11px] text-gray-500 mb-1">{m}월</div>
                   <input
                     className="w-full chip text-center text-[13px]"
                     placeholder="예시: 140000"
@@ -254,24 +376,25 @@
         <Section title="새 일지">
           <div className="flex flex-wrap gap-2">
             {STOCKS.map(s=>(
-              <button key={s.key} className="holo-btn" onClick={()=>add(s.key)}>{s.name}</button>
+              <button key={s.key} className="tab" onClick={()=>add(s.key)}>{s.name}</button>
             ))}
           </div>
-          <p className="text-[12px] muted mt-3">버튼을 눌러 바로 일지 시트를 열 수 있어요.</p>
+          <p className="text-[12px] text-gray-500 mt-3">버튼을 눌러 바로 일지 시트를 열 수 있어요.</p>
         </Section>
       );
     }
 
-    function Guide(){
+    /* 하단 가이드: 가운데 정렬, 불릿 없음 */
+    function GuideInline(){
       return (
-        <Section title="가이드">
-          <ul className="list-disc pl-5 text-[13px] space-y-1 muted">
-            <li>월별 금액은 편집을 눌러 입력해 두면 저장돼요.</li>
-            <li>좌우 〈, 〉 유리 버튼으로 카드 이동.</li>
-            <li>일지는 ‘잘한 점/피드백’으로 나눠 기록합니다.</li>
-            <li>모든 데이터는 이 기기에만 저장됩니다.</li>
-          </ul>
-        </Section>
+        <div className="max-w-3xl mx-auto mt-8 px-2 text-center">
+          <div className="text-[13px] text-[#6b7280] leading-7">
+            월별 금액은 편집을 눌러 입력해 두면 저장돼요.<br/>
+            좌우 〈, 〉 유리 버튼으로 카드 이동.<br/>
+            일지는 ‘잘한 점/피드백’으로 나눠 기록합니다.<br/>
+            모든 데이터는 기기 간 자동 동기화됩니다.
+          </div>
+        </div>
       );
     }
 
@@ -285,53 +408,53 @@
           <div className="absolute inset-0 bg-black/30" onClick={()=>setEditing(null)}></div>
           <div className="absolute left-0 right-0 bottom-0 glass p-4 rounded-t-2xl">
             <div className="flex items-center justify-between">
-              <div className="text-sm muted">일지 입력 · {stock}</div>
+              <div className="text-sm text-gray-500">일지 입력 · {stock}</div>
               <button className="chip" onClick={()=>setEditing(null)}>닫기</button>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-3">
-              <div><div className="text-xs muted mb-1">날짜</div>
+              <div><div className="text-xs text-gray-500 mb-1">날짜</div>
                 <input type="date" className="chip w-full" value={entry.date} onChange={e=>upd('date', e.target.value)}/></div>
-              <div><div className="text-xs muted mb-1">사이드</div>
+              <div><div className="text-xs text-gray-500 mb-1">사이드</div>
                 <select className="chip w-full" value={entry.side} onChange={e=>upd('side', e.target.value)}>
                   <option>매수</option><option>매도</option><option>관망</option><option>청산</option>
                 </select></div>
 
-              <div><div className="text-xs muted mb-1">수량</div>
+              <div><div className="text-xs text-gray-500 mb-1">수량</div>
                 <input className="chip w-full" value={entry.qty} onChange={e=>upd('qty', e.target.value)}/></div>
-              <div><div className="text-xs muted mb-1">가격</div>
+              <div><div className="text-xs text-gray-500 mb-1">가격</div>
                 <input className="chip w-full" value={entry.price} onChange={e=>upd('price', e.target.value)}/></div>
 
-              <div className="col-span-2"><div className="text-xs muted mb-1">부분익절/목표</div>
+              <div className="col-span-2"><div className="text-xs text-gray-500 mb-1">부분익절/목표</div>
                 <input className="chip w-full" value={entry.target} onChange={e=>upd('target', e.target.value)}/></div>
-              <div className="col-span-2"><div className="text-xs muted mb-1">리스크/손절</div>
+              <div className="col-span-2"><div className="text-xs text-gray-500 mb-1">리스크/손절</div>
                 <input className="chip w-full" value={entry.stop} onChange={e=>upd('stop', e.target.value)}/></div>
 
-              <div className="col-span-2"><div className="text-xs muted mb-1">진입 계획(시나리오)</div>
+              <div className="col-span-2"><div className="text-xs text-gray-500 mb-1">진입 계획(시나리오)</div>
                 <textarea rows="2" className="chip w-full" value={entry.plan} onChange={e=>upd('plan', e.target.value)}></textarea></div>
-              <div className="col-span-2"><div className="text-xs muted mb-1">실행/종료 이유</div>
+              <div className="col-span-2"><div className="text-xs text-gray-500 mb-1">실행/종료 이유</div>
                 <textarea rows="2" className="chip w-full" value={entry.reason} onChange={e=>upd('reason', e.target.value)}></textarea></div>
 
-              <div><div className="text-xs muted mb-1">실현 수익률(%)</div>
+              <div><div className="text-xs text-gray-500 mb-1">실현 수익률(%)</div>
                 <input className="chip w-full" value={entry.resultPct} onChange={e=>upd('resultPct', e.target.value)}/></div>
-              <div><div className="text-xs muted mb-1">실현 손익(₩)</div>
+              <div><div className="text-xs text-gray-500 mb-1">실현 손익(₩)</div>
                 <input className="chip w-full" value={entry.resultPnl} onChange={e=>upd('resultPnl', e.target.value)}/></div>
 
-              <div><div className="text-xs muted mb-1">보유</div>
+              <div><div className="text-xs text-gray-500 mb-1">보유</div>
                 <select className="chip w-full" value={entry.hold? 'Y':'N'} onChange={e=>upd('hold', e.target.value==='Y')}>
                   <option value="N">아니오</option><option value="Y">예</option></select></div>
-              <div><div className="text-xs muted mb-1">태그</div>
+              <div><div className="text-xs text-gray-500 mb-1">태그</div>
                 <input className="chip w-full" value={entry.tags} onChange={e=>upd('tags', e.target.value)}/></div>
 
-              <div className="col-span-2"><div className="text-xs muted mb-1">잘한 점</div>
+              <div className="col-span-2"><div className="text-xs text-gray-500 mb-1">잘한 점</div>
                 <textarea rows="2" className="chip w-full" value={entry.good} onChange={e=>upd('good', e.target.value)}></textarea></div>
-              <div className="col-span-2"><div className="text-xs muted mb-1">피드백</div>
+              <div className="col-span-2"><div className="text-xs text-gray-500 mb-1">피드백</div>
                 <textarea rows="3" className="chip w-full" value={entry.feedback} onChange={e=>upd('feedback', e.target.value)}></textarea></div>
             </div>
 
             <div className="mt-3 flex gap-2">
               <button className="chip flex-1" onClick={()=>setEditing(null)}>취소</button>
-              <button className="holo-btn flex-1" onClick={onSave}>저장</button>
+              <button className="tab flex-1" onClick={onSave}>저장</button>
             </div>
           </div>
         </div>
@@ -377,21 +500,21 @@
                 <option value="desc">내림</option>
                 <option value="asc">오름</option>
               </select>
-              <button className="holo-btn" onClick={()=> alert('대시보드 > 새 일지에서 추가해주세요 😊')}>새 일지</button>
+              <button className="tab" onClick={()=> alert('대시보드 > 새 일지에서 추가해주세요 😊')}>새 일지</button>
             </div>
           </div>
 
-          {/* 모바일 카드: 피드백만 노출 */}
+          {/* 모바일 카드(피드백 중심) */}
           <div className="space-y-2 md:hidden">
             {filtered.map(e=>(
               <div key={e.id} className="glass p-3 rounded-xl">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm">{e.date} · <span className="muted">{e.side}</span></div>
+                  <div className="text-sm">{e.date} · <span className="text-gray-500">{e.side}</span></div>
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 text-[13px]">
-                  <div><span className="muted text-[12px]">수량</span> {e.qty||'-'}</div>
-                  <div><span className="muted text-[12px]">가격</span> {e.price||'-'}</div>
-                  <div><span className="muted text-[12px]">실현(%)</span> {e.resultPct||'-'}</div>
+                  <div><span className="text-gray-500 text-[12px]">수량</span> {e.qty||'-'}</div>
+                  <div><span className="text-gray-500 text-[12px]">가격</span> {e.price||'-'}</div>
+                  <div><span className="text-gray-500 text-[12px]">실현(%)</span> {e.resultPct||'-'}</div>
                 </div>
                 {e.feedback && <div className="mt-2 text-[13px] text-gray-700">{e.feedback}</div>}
                 <div className="mt-3 flex gap-2">
@@ -400,7 +523,7 @@
                 </div>
               </div>
             ))}
-            {filtered.length===0 && <div className="text-center muted py-6 text-sm">아직 기록이 없어요.</div>}
+            {filtered.length===0 && <div className="text-center text-gray-500 py-6 text-sm">아직 기록이 없어요.</div>}
           </div>
 
           {/* 데스크톱 테이블 */}
@@ -431,7 +554,7 @@
                     </td>
                   </tr>
                 ))}
-                {filtered.length===0 && (<tr><td colSpan="10" className="px-3 py-10 text-center muted">기록이 없습니다.</td></tr>)}
+                {filtered.length===0 && (<tr><td colSpan="10" className="px-3 py-10 text-center text-gray-500">기록이 없습니다.</td></tr>)}
               </tbody>
             </table>
           </div>
@@ -442,7 +565,7 @@
     function App(){
       const [state, setState] = useLocalState(APP_KEY, defaultState);
       const [tab, setTab] = useState('dashboard');
-      const [active, setActive] = useState(0); // 0: 월별, 1: 새일지, 2: 가이드
+      const [active, setActive] = useState(0); // 0: 월별, 1: 새일지
       const [stockTab, setStockTab] = useState(STOCKS[0].key);
       const [editing, setEditing] = useState(null);
 
@@ -472,8 +595,7 @@
 
       const slides = [
         <Monthly key="m" state={state} setMonthly={setMonthly} />,
-        <QuickAdd key="q" add={addEntry} />,
-        <Guide key="g" />
+        <QuickAdd key="q" add={addEntry} />
       ];
 
       return (
@@ -483,7 +605,7 @@
             <div className="flex items-center justify-between pt-6">
               <div>
                 <div className="brand">stock tracker</div>
-                <div className="muted text-xs mt-1">swing diary & monthly pnl · local only</div>
+                <div className="subtitle">swing diary &amp; monthly pnl · cloud sync</div>
               </div>
               <div className="flex gap-2">
                 <button className={"tab "+(tab==='dashboard'?'active':'')} onClick={()=>setTab('dashboard')}>대시보드</button>
@@ -492,17 +614,20 @@
               </div>
             </div>
 
-            {/* 대시보드 캐러셀 */}
+            {/* 대시보드 */}
             {tab==='dashboard' && (
-              <div className="relative mt-8 deck">
-                {slides.map((el, i)=>(
-                  <div key={i} className={"slide "+(active===i?'active':'')}>
-                    {el}
-                  </div>
-                ))}
-                <button className="nav-fab nav-left" aria-label="이전" onClick={()=>setActive((active+slides.length-1)%slides.length)}>&lt;</button>
-                <button className="nav-fab nav-right" aria-label="다음" onClick={()=>setActive((active+1)%slides.length)}>&gt;</button>
-              </div>
+              <>
+                <div className="relative mt-8 deck">
+                  {slides.map((el, i)=>(
+                    <div key={i} className={"slide "+(active===i?'active':'')}>
+                      {el}
+                    </div>
+                  ))}
+                  <button className="nav-fab nav-left" aria-label="이전" onClick={()=>setActive((active+slides.length-1)%slides.length)}>&lt;</button>
+                  <button className="nav-fab nav-right" aria-label="다음" onClick={()=>setActive((active+1)%slides.length)}>&gt;</button>
+                </div>
+                <GuideInline/>
+              </>
             )}
 
             {/* 일지 */}
