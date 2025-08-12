@@ -20,23 +20,24 @@
       --stroke: rgba(255,255,255,.55);
       --muted:#6b7280;
       --text:#0f172a;
-      --shadow: 0 8px 20px rgba(15, 23, 42, .10);
-      --shadow-soft: 0 6px 14px rgba(15, 23, 42, .08);
+      --shadow: 0 10px 24px rgba(15, 23, 42, .12);
+      --soft: 0 6px 16px rgba(15, 23, 42, .10);
       --safe: env(safe-area-inset-bottom, 0px);
     }
     html,body{height:100%}
     body{
       font-family:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       color:var(--text);
-      /* holographic */
+      /* holographic BG */
       background:
         radial-gradient(1000px 600px at 10% -10%, #bfe3ff 0%, transparent 60%),
         radial-gradient(900px 520px at 100% 20%, #ffe0f5 0%, transparent 55%),
         radial-gradient(700px 520px at 40% 110%, #d9ffef 0%, transparent 50%),
         linear-gradient(180deg, #f7fbff, #eef0ff 60%, #fff0fb);
+      overflow-x:hidden;
     }
     .glass-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.48));
+      background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.55));
       backdrop-filter: blur(16px) saturate(140%);
       -webkit-backdrop-filter: blur(16px) saturate(140%);
       border:1px solid var(--stroke);
@@ -45,24 +46,12 @@
     }
     .muted{ color:var(--muted); }
 
-    .glass-input,.glass-select,.glass-textarea{
-      background: rgba(255,255,255,.7);
-      border:1px solid rgba(255,255,255,.95);
-      border-radius:12px;
-      padding:10px 12px;
-      outline:none; transition:.18s ease; box-shadow: var(--shadow-soft);
-    }
-    .glass-input:focus,.glass-select:focus,.glass-textarea:focus{
-      box-shadow:0 0 0 4px rgba(59,130,246,.15);
-      border-color:#cfe3ff;
-    }
     .pill{
       border-radius:12px;
-      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7));
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.78));
       border:1px solid rgba(255,255,255,.92);
-      padding:8px 12px; box-shadow: var(--shadow-soft);
+      padding:8px 12px; box-shadow: var(--soft);
     }
-
     .holo-btn{
       position:relative; border-radius:14px; padding:10px 16px; cursor:pointer;
       color:#0b1220; font-weight:600; border:1px solid transparent;
@@ -74,19 +63,21 @@
     }
     .holo-btn:hover{ transform:translateY(-1px); }
 
-    /* Carousel */
-    .carousel{
-      scroll-behavior:smooth;
-      overflow-x:auto; display:flex; gap:22px; padding:8px 6px;
-      align-items:center; min-height: 64vh;    /* 가운데 정렬 */
+    /* Deck: 한 카드만 중앙에 표시 */
+    .deck-wrap{ position:relative; height:560px; }
+    .deck-card{
+      width: 360px; height: 520px;
+      position:absolute; left:50%; top:50%; transform: translate(-50%,-50%);
+      opacity:0; pointer-events:none; transition: opacity .25s ease, transform .35s cubic-bezier(.2,.7,.2,1);
     }
-    .carousel::-webkit-scrollbar{ display:none; }
-    .carousel{ -ms-overflow-style:none; scrollbar-width:none; }
+    .deck-card.active{ opacity:1; pointer-events:auto; transform: translate(-50%,-50%) scale(1); }
+    .deck-card.prev{ transform: translate(calc(-50% - 40px),-50%) scale(.96); }
+    .deck-card.next{ transform: translate(calc(-50% + 40px),-50%) scale(.96); }
 
     /* Round glass nav */
     .nav-btn{
       position:absolute; top:50%; transform:translateY(-50%);
-      width:46px; height:46px; z-index:20;               /* 클릭 잘 되게 */
+      width:46px; height:46px; z-index:20;
       display:flex; align-items:center; justify-content:center;
       border-radius:9999px; cursor:pointer; user-select:none;
       background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.7));
@@ -95,23 +86,30 @@
       -webkit-backdrop-filter: blur(10px) saturate(160%);
       box-shadow: var(--shadow); color:#334155;
     }
-    .nav-left{ left:-16px; }
-    .nav-right{ right:-16px; }
+    .nav-left{ left:-6px; }
+    .nav-right{ right:-6px; }
 
-    /* Equal card size */
-    .deck-card{
-      min-width:360px; width:360px; height:520px;      /* 크기 통일 */
-      display:flex; flex-direction:column;
+    .glass-input,.glass-select,.glass-textarea{
+      background: rgba(255,255,255,.7);
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none; transition:.18s ease; box-shadow: var(--soft);
+    }
+    .glass-input:focus,.glass-select:focus,.glass-textarea:focus{
+      box-shadow:0 0 0 4px rgba(59,130,246,.15);
+      border-color:#cfe3ff;
     }
 
-    /* stat */
+    /* monthly grid 내부 스크롤바 숨김(투명) */
+    .scroll-smooth{ -ms-overflow-style:none; scrollbar-width:none; }
+    .scroll-smooth::-webkit-scrollbar{ width:0; height:0; background:transparent; }
+
+    /* stats 글자 안 잘림 */
     .stat .label{ font-size:12px; color:var(--muted); }
-    .stat .value{
-      font-weight:600; font-size:16px;                 /* 숫자 안 잘림 */
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
+    .stat .value{ font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    /* bottom sheet (editor) */
+    /* sheet */
     .sheet{
       position:fixed; left:0; right:0; bottom:0; z-index:50;
       background:#fff; border-top-left-radius:16px; border-top-right-radius:16px;
@@ -121,39 +119,49 @@
     }
     .sheet.open{ transform:translateY(0%); }
     .sheet-handle{ width:44px; height:5px; border-radius:9999px; background:#e5e7eb; margin:8px auto 6px; }
+
+    /* 상단 배경: cursive 서명 애니메이션 */
+    .signature{
+      position:absolute; left:40px; top:26px; pointer-events:none; z-index:0;
+      opacity:.7; filter: drop-shadow(0 8px 24px rgba(0,0,0,.08));
+    }
+    .signature text{
+      font-family: "Brush Script MT", "Pacifico", "Comic Sans MS", cursive;
+      font-size:64px; fill:transparent; stroke:#ffffff; stroke-width:1.2;
+      stroke-linecap:round; stroke-linejoin:round;
+      stroke-dasharray:1200; stroke-dashoffset:1200; animation:write 2.8s ease forwards 0.3s;
+    }
+    @keyframes write{ to{ stroke-dashoffset:0; } }
   </style>
 </head>
 <body>
-  <div id="root" class="min-h-screen"></div>
+  <!-- 서명 애니메이션 (배경) -->
+  <svg class="signature" width="560" height="90" viewBox="0 0 560 90">
+    <text x="0" y="62">stock tracker</text>
+  </svg>
+
+  <div id="root" class="relative z-10 min-h-screen"></div>
 
   <script type="text/babel">
-    const {useState,useMemo,useEffect,useRef} = React;
+    const {useState,useMemo,useEffect} = React;
 
-    const APP_KEY = "swing-home-v4";
+    const APP_KEY = "swing-home-v5";
     const STOCKS = [
       { key:'kakao', name:'카카오' },
       { key:'samsung', name:'삼성전자' },
       { key:'sm', name:'에스엠' },
     ];
-
-    /* ---------- util ---------- */
     const currency = n => Number(n||0).toLocaleString();
 
-    /* ---------- local state ---------- */
     function useLocalState(key, initial){
       const [state, setState] = useState(()=>{
-        try{
-          const raw = localStorage.getItem(key);
-          return raw? JSON.parse(raw) : initial;
-        }catch(e){ return initial; }
+        try{ const raw=localStorage.getItem(key); return raw? JSON.parse(raw):initial; }
+        catch(e){ return initial; }
       });
-      useEffect(()=>{
-        try{ localStorage.setItem(key, JSON.stringify(state)); }catch(e){}
-      }, [key, state]);
-      return [state, setState];
+      useEffect(()=>{ try{ localStorage.setItem(key, JSON.stringify(state)); }catch{} },[key,state]);
+      return [state,setState];
     }
 
-    /* ---------- data model ---------- */
     const defaultEntry = () => ({
       id: (crypto?.randomUUID?.() || String(Date.now()+Math.random())),
       date: new Date().toISOString().slice(0,10),
@@ -166,82 +174,35 @@
 
     const defaultState = {
       settings: { initialSeed: 16000000 },
-      monthlyPnL: {},                        // 'YYYY-MM' : '금액'
+      monthlyPnL: {},
       journals: { kakao:[], samsung:[], sm:[] }
     };
 
-    /* ---------- UI ---------- */
-    const Section = ({title, right, children, className=""}) => (
-      <div className={"glass-card p-4 md:p-5 deck-card " + className}>
-        <div className="flex items-center justify-between mb-3">
-          <div className="font-semibold text-[15px] text-slate-800">{title}</div>
-          <div className="flex items-center gap-2">{right}</div>
-        </div>
-        <div className="flex-1 overflow-auto pr-1">{children}</div>
-      </div>
-    );
-
-    const Stat = ({label, value}) => (
+    /* ---------- 작은 UI들 ---------- */
+    const Stat = ({label,value}) => (
       <div className="glass-card p-3 stat">
         <div className="label">{label}</div>
         <div className="value">{value}</div>
       </div>
     );
 
-    function MonthlyPnLTable({ monthly, onChange }){
-      const [year, setYear] = useState(new Date().getFullYear());
-      const months = Array.from({length:12}, (_,i)=>i+1);
-      const ym = (y,m)=> `${y}-${String(m).padStart(2,'0')}`;
-      const [editing, setEditing] = useState(false);
-
+    const CardFrame = ({title, right, children, status})=>{
+      // status: 'active' | 'prev' | 'next' (deck 애니메이션 클래스)
       return (
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs muted">연도</span>
-              <select className="glass-select text-[13px] py-[6px]" value={year} onChange={e=>setYear(Number(e.target.value))}>
-                {Array.from({length:6},(_,i)=>new Date().getFullYear()-3+i).map(y=>(
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
-            </div>
-            <button className="pill text-[13px]" onClick={()=>setEditing(v=>!v)}>{editing? '완료':'편집'}</button>
+        <section className={`glass-card p-4 md:p-5 deck-card ${status||''}`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="font-semibold text-[15px] text-slate-800">{title}</div>
+            <div className="flex items-center gap-2">{right}</div>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {months.map(m=>{
-              const key = ym(year, m);
-              const v = monthly[key] ?? '';
-              return (
-                <div key={key} className="glass-card p-2">
-                  <div className="text-xs muted mb-1">{m}월</div> {/* ← n월만 표기 */}
-                  <input
-                    className="glass-input w-full text-right"
-                    placeholder="예: 140000"
-                    value={v}
-                    disabled={!editing}
-                    onChange={e=>onChange(key, e.target.value)}
-                  />
-                </div>
-              )
-            })}
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 mt-3">
-            <Stat label="월 합계" value={`${currency(Object.values(monthly).reduce((s,v)=>s+Number(v||0),0))} 원`}/>
-            <Stat label="현재 시드" value={`${currency(/* 추후 합산 가능 */ Number(16000000))} 원`}/>
-            <Stat label="수익률" value={`0.0 %`}/>
-            <Stat label="총 일지 수" value={`0 건`}/>
-          </div>
-        </div>
+          <div className="h-[420px] overflow-auto pr-1 scroll-smooth">{children}</div>
+        </section>
       );
-    }
+    };
 
     function EditorSheet({ editing, setEditing, onSave }){
       if(!editing) return null;
       const { entry, stock } = editing;
       const update = (k,v)=> setEditing(p=> ({...p, entry:{...p.entry, [k]:v}}));
-
       return (
         <div className="sheet open">
           <div className="sheet-handle"></div>
@@ -285,7 +246,6 @@
                 <div className="text-xs muted mb-1">잘한 점</div>
                 <textarea rows="2" className="glass-textarea w-full" value={entry.good} onChange={e=>update('good', e.target.value)}></textarea>
               </div>
-
               <div className="col-span-2">
                 <div className="text-xs muted mb-1">피드백</div>
                 <textarea rows="3" className="glass-textarea w-full" value={entry.feedback} onChange={e=>update('feedback', e.target.value)}></textarea>
@@ -311,88 +271,217 @@
       )
     }
 
-    /* ---------- App ---------- */
+    /* ---------- 각 카드 컨텐츠 ---------- */
+    function MonthlyCard({state, setMonthly}){
+      const [year,setYear] = useState(new Date().getFullYear());
+      const [editing,setEditing] = useState(false);
+      const months = Array.from({length:12},(_,i)=>i+1);
+      const ym = (y,m)=>`${y}-${String(m).padStart(2,'0')}`;
+
+      const total = Object.values(state.monthlyPnL).reduce((s,v)=>s+Number(v||0),0);
+
+      return (
+        <CardFrame
+          title="월별 실현 손익"
+          right={<button className="pill text-[13px]" onClick={()=>setEditing(v=>!v)}>{editing? '완료':'편집'}</button>}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs muted">연도</span>
+            <select className="glass-select text-[12px] py-[4px]" value={year} onChange={e=>setYear(Number(e.target.value))}>
+              {Array.from({length:6},(_,i)=>new Date().getFullYear()-3+i).map(y=><option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {months.map(m=>{
+              const key=ym(year,m); const v=state.monthlyPnL[key] ?? '';
+              return (
+                <div key={key} className="glass-card p-2">
+                  <div className="text-xs muted mb-1">{m}월</div>
+                  <input className="glass-input w-full text-right" placeholder="예: 140000" value={v} disabled={!editing} onChange={e=>setMonthly(key, e.target.value)} />
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+            <Stat label="월 합계" value={`${currency(total)} 원`} />
+            <Stat label="현재 시드" value={`${currency(state.settings.initialSeed)} 원`} />
+            <Stat label="수익률" value={`0.0 %`} />
+            <Stat label="총 일지 수" value={`${['kakao','samsung','sm'].reduce((s,k)=>s+state.journals[k].length,0)} 건`} />
+          </div>
+        </CardFrame>
+      );
+    }
+
+    function QuickAddCard({openNew}){
+      return (
+        <CardFrame title="새 일지">
+          <div className="flex flex-wrap gap-2">
+            <button className="holo-btn" onClick={()=>openNew('kakao')}>카카오</button>
+            <button className="holo-btn" onClick={()=>openNew('samsung')}>삼성전자</button>
+            <button className="holo-btn" onClick={()=>openNew('sm')}>에스엠</button>
+          </div>
+          <p className="muted text-xs mt-3">버튼을 눌러 바로 일지 시트를 열 수 있어요.</p>
+        </CardFrame>
+      );
+    }
+
+    function GuideCard(){
+      return (
+        <CardFrame title="가이드">
+          <ul className="list-disc pl-5 text-sm muted space-y-1">
+            <li>월별 금액은 <b>편집</b>을 눌러 입력해 두면 저장돼요.</li>
+            <li>좌우 <b>&lt;</b>, <b>&gt;</b> 유리 버튼으로 카드 이동.</li>
+            <li>일지는 ‘잘한 점/피드백’으로 나눠 기록합니다.</li>
+            <li>모든 데이터는 이 기기에만 저장됩니다.</li>
+          </ul>
+        </CardFrame>
+      );
+    }
+
+    /* 일지 탭 리스트(모바일 카드) */
+    function JournalList({state, setState}){
+      const [stockTab,setStockTab] = useState('kakao');
+      const [q,setQ] = useState('');
+      const [sortKey,setSortKey] = useState('date');
+      const [sortDir,setSortDir] = useState('desc');
+
+      const filtered = useMemo(()=>{
+        let arr = [...state.journals[stockTab]];
+        if(q){
+          const t=q.toLowerCase();
+          arr = arr.filter(e=>[e.date,e.side,e.good,e.feedback,e.tags].join(' ').toLowerCase().includes(t));
+        }
+        const dir = sortDir==='asc'?1:-1;
+        arr.sort((a,b)=>(a[sortKey]>b[sortKey]?dir:-dir));
+        return arr;
+      }, [state,stockTab,q,sortKey,sortDir]);
+
+      const removeEntry = (id)=>{
+        if(!confirm('삭제할까요?')) return;
+        setState(prev=>({...prev, journals:{...prev.journals,[stockTab]:prev.journals[stockTab].filter(e=>e.id!==id)}}));
+      };
+
+      return (
+        <div className="glass-card p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div className="flex gap-2">
+              {[
+                {k:'kakao',n:'카카오'},
+                {k:'samsung',n:'삼성전자'},
+                {k:'sm',n:'에스엠'},
+              ].map(s=>(
+                <button key={s.k} className={`pill ${stockTab===s.k?'ring-2 ring-blue-200':''}`} onClick={()=>setStockTab(s.k)}>{s.n}</button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <input className="glass-input w-[170px]" placeholder="검색" value={q} onChange={e=>setQ(e.target.value)}/>
+              <select className="glass-select" value={sortKey} onChange={e=>setSortKey(e.target.value)}>
+                <option value="date">날짜</option>
+                <option value="resultPnl">손익</option>
+              </select>
+              <select className="glass-select" value={sortDir} onChange={e=>setSortDir(e.target.value)}>
+                <option value="desc">내림</option>
+                <option value="asc">오름</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {filtered.map(e=>(
+              <div key={e.id} className="border border-[#eef2f7] rounded-xl p-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">{e.date} · <span className="muted">{e.side}</span></div>
+                  {/* 모바일에서 숫자, 태그/감정은 숨김 → 표시 안함 */}
+                </div>
+                {/* 피드백만 보여줌 */}
+                {e.feedback && <div className="mt-2 text-[13px] text-gray-700">{e.feedback}</div>}
+                <div className="mt-3 flex gap-2">
+                  <button className="pill" onClick={()=>alert('수정은 “대시보드 > 새 일지”에서 저장 시 덮어쓰기 방식으로 간단 지원합니다. 필요하면 수정기능 따로 붙일게요!')}>수정</button>
+                  <button className="pill" style="color:#dc2626;border-color:#fecaca" onClick={()=>removeEntry(e.id)}>삭제</button>
+                </div>
+              </div>
+            ))}
+            {filtered.length===0 && <div className="text-center muted py-6 text-sm">기록이 없습니다.</div>}
+          </div>
+        </div>
+      );
+    }
+
+    /* ---------- 최상위 App ---------- */
     function App(){
-      const [state, setState] = useLocalState(APP_KEY, defaultState);
-      const [tab, setTab] = useState('dashboard');
-      const [editing, setEditing] = useState(null);
+      const [state,setState] = useLocalState(APP_KEY, defaultState);
+      const [tab,setTab] = useState('dashboard');
+      const [editing,setEditing] = useState(null);
+      const [index,setIndex] = useState(0); // deck index
+      const cards = ['monthly','quick','guide'];
+      const go = dir => setIndex(i => (i+dir+cards.length)%cards.length);
 
-      const carouselRef = useRef(null);
-      const scrollByCard = (dir)=>{
-        const el = carouselRef.current;
-        if(!el) return;
-        const cardW = el.querySelector('.deck-card')?.getBoundingClientRect().width || 360;
-        el.scrollBy({ left: dir*(cardW+22), behavior:'smooth' });
+      const setMonthly = (ym,value)=> setState(prev=>({...prev, monthlyPnL:{...prev.monthlyPnL,[ym]:value}}));
+      const openNew = stock => setEditing({stock, entry: defaultEntry()});
+      const onSave = ()=>{
+        const {stock, entry} = editing;
+        setState(prev=>({...prev, journals:{...prev.journals,[stock]:[entry, ...prev.journals[stock]]}}));
+        setEditing(null); alert('저장했어요!');
       };
-
-      const openNew = (stock)=> setEditing({ stock, entry: defaultEntry() });
-      const saveEntry = ()=>{
-        const { stock, entry } = editing;
-        setState(prev=>{
-          const next = [entry, ...prev.journals[stock]];
-          return { ...prev, journals:{ ...prev.journals, [stock]: next } };
-        });
-        setEditing(null);
-        alert('저장했어요!');
-      };
-
-      const setMonthly = (ym, value)=> setState(prev=>({
-        ...prev, monthlyPnL: { ...prev.monthlyPnL, [ym]: value }
-      }));
 
       return (
         <div className="min-h-screen">
           {/* Header */}
-          <header className="max-w-7xl mx-auto px-5 pt-8 pb-6">
+          <header className="max-w-7xl mx-auto px-5 pt-8 pb-6 relative z-10">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">stock tracker</h1>
-                <p className="muted text-sm">swing diary & monthly pnl · local only</p>
+                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight relative z-10">stock tracker</h1>
+                <p className="muted text-sm relative z-10">swing diary & monthly pnl · local only</p>
               </div>
-              <div className="flex gap-2">
-                <button className={"pill " + (tab==='dashboard'?'ring-2 ring-blue-200':'')} onClick={()=>setTab('dashboard')}>대시보드</button>
-                <button className={"pill " + (tab==='settings'?'ring-2 ring-blue-200':'')} onClick={()=>setTab('settings')}>설정</button>
+              <div className="flex gap-2 relative z-10">
+                <button className={`pill ${tab==='dashboard'?'ring-2 ring-blue-200':''}`} onClick={()=>setTab('dashboard')}>대시보드</button>
+                <button className={`pill ${tab==='journal'?'ring-2 ring-blue-200':''}`} onClick={()=>setTab('journal')}>일지</button>
+                <button className={`pill ${tab==='settings'?'ring-2 ring-blue-200':''}`} onClick={()=>setTab('settings')}>설정</button>
               </div>
             </div>
           </header>
 
           {/* Dashboard */}
           {tab==='dashboard' && (
-            <main className="relative">
-              <div className="max-w-7xl mx-auto px-5">
-                <div className="relative">
-                  {/* nav buttons */}
-                  <button className="nav-btn nav-left hidden md:flex" aria-label="left" onClick={()=>scrollByCard(-1)}>&lt;</button>
-                  <button className="nav-btn nav-right hidden md:flex" aria-label="right" onClick={()=>scrollByCard(1)}>&gt;</button>
+            <main className="max-w-7xl mx-auto px-5 pb-12">
+              <div className="deck-wrap">
+                {/* 좌우 버튼 */}
+                <button className="nav-btn nav-left hidden md:flex" aria-label="left" onClick={()=>go(-1)}>&lt;</button>
+                <button className="nav-btn nav-right hidden md:flex" aria-label="right" onClick={()=>go(1)}>&gt;</button>
 
-                  <div className="carousel" ref={carouselRef}>
-                    {/* 월별 실현 손익 */}
-                    <Section title="월별 실현 손익">
-                      <MonthlyPnLTable monthly={state.monthlyPnL} onChange={setMonthly}/>
-                    </Section>
-
-                    {/* 새 일지 */}
-                    <Section title="새 일지">
-                      <div className="flex flex-wrap gap-2">
-                        <button className="holo-btn" onClick={()=>openNew('kakao')}>카카오</button>
-                        <button className="holo-btn" onClick={()=>openNew('samsung')}>삼성전자</button>
-                        <button className="holo-btn" onClick={()=>openNew('sm')}>에스엠</button>
-                      </div>
-                      <p className="muted text-xs mt-3">버튼을 눌러 바로 일지 시트를 열 수 있어요.</p>
-                    </Section>
-
-                    {/* 가이드 */}
-                    <Section title="가이드">
-                      <ul className="list-disc pl-5 text-sm muted space-y-1">
-                        <li>월별 금액은 <b>편집</b>을 눌러 입력해 두면 저장돼요.</li>
-                        <li>좌우 <b>&lt;</b>, <b>&gt;</b> 유리 버튼으로 카드 이동.</li>
-                        <li>일지는 ‘잘한 점/피드백’으로 나눠 기록합니다.</li>
-                        <li>모든 데이터는 이 기기에만 저장됩니다.</li>
-                      </ul>
-                    </Section>
-                  </div>
+                {/* 카드 3개, 한 장만 활성 */}
+                <div className={(index===0)?'':'hidden md:block'}>
+                  <MonthlyCard state={state} setMonthly={setMonthly}/>
                 </div>
+                <div className={(index===1)?'':'hidden md:block'}>
+                  <QuickAddCard openNew={openNew}/>
+                </div>
+                <div className={(index===2)?'':'hidden md:block'}>
+                  <GuideCard/>
+                </div>
+
+                {/* md 이상에서 주변 카드 살짝 보이게 - 클래스만 부여 */}
+                <div className="hidden md:block">
+                  <MonthlyCard state={state} setMonthly={setMonthly}/>
+                </div>
+                <div className="hidden md:block">
+                  <QuickAddCard openNew={openNew}/>
+                </div>
+                <div className="hidden md:block">
+                  <GuideCard/>
+                </div>
+
+                <script type="text/babel" data-presets="react"></script>
               </div>
+            </main>
+          )}
+
+          {/* Journal */}
+          {tab==='journal' && (
+            <main className="max-w-6xl mx-auto px-5 pb-16">
+              <JournalList state={state} setState={setState}/>
             </main>
           )}
 
@@ -416,12 +505,10 @@
             </main>
           )}
 
-          {/* Editor Sheet */}
-          <EditorSheet editing={editing} setEditing={setEditing} onSave={saveEntry}/>
-
+          <EditorSheet editing={editing} setEditing={setEditing} onSave={onSave}/>
           <footer className="pb-[calc(20px+var(--safe))]"></footer>
         </div>
-      )
+      );
     }
 
     ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
