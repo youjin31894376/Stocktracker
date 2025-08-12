@@ -11,7 +11,7 @@
   <!-- Pretendard -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css"/>
 
-  <!-- Cursive Title Font -->
+  <!-- Cursive Title -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
@@ -48,34 +48,42 @@
       border-radius: 18px;
       box-shadow: var(--shadow);
     }
-    .glass-soft { background: rgba(255,255,255,.58); }
+    .glass-soft { background: rgba(255,255,255,.58); border:1px solid rgba(255,255,255,.55); border-radius:14px; }
 
-    /* 홀로 스타일 변수 */
-    .holo-border{
+    /* 홀로그램 보더 */
+    .holo-surface{
       background:
         linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.75)) padding-box,
         conic-gradient(from 180deg, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
       border:1px solid transparent;
     }
 
-    /* 탭(대시보드/일지/설정) – 홀로그램 */
+    /* 탭 */
     .tab{
       border-radius:12px; padding:.46rem .85rem; font-weight:500;
       transition:.2s;
       box-shadow: 0 8px 20px rgba(2,6,23,.07), inset 0 1px 0 rgba(255,255,255,.7);
+      background:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.7);
     }
-    .tab:not(.active){ background:rgba(255,255,255,.7); border:1px solid rgba(255,255,255,.7); }
-    .tab.active{ composes: holo-border; }
+    .tab.active{ /* 홀로그램 보더 */
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.75)) padding-box,
+        conic-gradient(from 180deg, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
+      border:1px solid transparent;
+    }
     .tab:hover{ transform: translateY(-1px); }
 
     /* 유리 버튼 */
     .holo-btn{
-      composes: holo-border;
       border-radius:14px;
       padding:.55rem .9rem;
       color:#0b1220;
       transition:.2s;
       box-shadow: 0 10px 24px rgba(2, 6, 23, .07), inset 0 1px 0 rgba(255,255,255,.7);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.75)) padding-box,
+        conic-gradient(from 180deg, #7c3aed, #06b6d4, #22d3ee, #f472b6, #7c3aed) border-box;
+      border:1px solid transparent;
     }
     .holo-btn:hover{ transform: translateY(-1px); }
     .holo-btn:active{ transform: translateY(1px); }
@@ -90,7 +98,7 @@
     }
     .slide.active{ opacity:1; visibility:visible; pointer-events:auto; transform: scale(1); filter: blur(0); z-index:3; }
 
-    /* 좌우 화살 – 더 투명한 유리알 + 클릭 보장(z-index) */
+    /* 좌우 화살 – 유리알 */
     .nav-fab{
       position:absolute; top:50%; transform:translateY(-50%);
       width:46px; height:46px; display:grid; place-items:center;
@@ -183,7 +191,6 @@
       );
     };
 
-    /* 작은 통계 컴포넌트 */
     const AppCtx = React.createContext({totals:{}, count:0});
     const Stat = ({label, value})=>(
       <div className="glass-soft p-3 rounded-xl">
@@ -195,7 +202,6 @@
     function RoiStat(){ const {totals}=React.useContext(AppCtx); return <Stat label="수익률" value={`${pct(totals.roi)} %`} />; }
     function CountStat(){ const {count}=React.useContext(AppCtx); return <Stat label="총 일지 수" value={`${count} 건`} />; }
 
-    /* 1) 월별 손익 */
     function Monthly({state, setMonthly}){
       const [year, setYear] = useState(new Date().getFullYear());
       const months = Array.from({length:12}, (_,i)=> i+1);
@@ -223,7 +229,7 @@
                 <div key={key} className="cell">
                   <div className="text-[11px] muted mb-1">{m}월</div>
                   <input
-                    className="w-full chip text-center text-[13px]"  <!-- 가운데 정렬 + 폰트 축소 -->
+                    className="w-full chip text-center text-[13px]"
                     placeholder="예시: 140000"
                     value={v}
                     onChange={e=>setMonthly(key, e.target.value)}
@@ -243,7 +249,6 @@
       );
     }
 
-    /* 2) 새 일지 */
     function QuickAdd({add}){
       return (
         <Section title="새 일지">
@@ -257,7 +262,6 @@
       );
     }
 
-    /* 3) 가이드 */
     function Guide(){
       return (
         <Section title="가이드">
@@ -271,7 +275,6 @@
       );
     }
 
-    /* 편집 시트 */
     function EditorSheet({editing, setEditing, onSave}){
       if(!editing) return null;
       const {entry, stock} = editing;
@@ -305,9 +308,9 @@
                 <input className="chip w-full" value={entry.stop} onChange={e=>upd('stop', e.target.value)}/></div>
 
               <div className="col-span-2"><div className="text-xs muted mb-1">진입 계획(시나리오)</div>
-                <textarea rows="2" className="chip w-full" value={entry.plan} onChange={e=>upd('plan', e.target.value)}/></div>
+                <textarea rows="2" className="chip w-full" value={entry.plan} onChange={e=>upd('plan', e.target.value)}></textarea></div>
               <div className="col-span-2"><div className="text-xs muted mb-1">실행/종료 이유</div>
-                <textarea rows="2" className="chip w-full" value={entry.reason} onChange={e=>upd('reason', e.target.value)}/></div>
+                <textarea rows="2" className="chip w-full" value={entry.reason} onChange={e=>upd('reason', e.target.value)}></textarea></div>
 
               <div><div className="text-xs muted mb-1">실현 수익률(%)</div>
                 <input className="chip w-full" value={entry.resultPct} onChange={e=>upd('resultPct', e.target.value)}/></div>
@@ -321,9 +324,9 @@
                 <input className="chip w-full" value={entry.tags} onChange={e=>upd('tags', e.target.value)}/></div>
 
               <div className="col-span-2"><div className="text-xs muted mb-1">잘한 점</div>
-                <textarea rows="2" className="chip w-full" value={entry.good} onChange={e=>upd('good', e.target.value)}/></div>
+                <textarea rows="2" className="chip w-full" value={entry.good} onChange={e=>upd('good', e.target.value)}></textarea></div>
               <div className="col-span-2"><div className="text-xs muted mb-1">피드백</div>
-                <textarea rows="3" className="chip w-full" value={entry.feedback} onChange={e=>upd('feedback', e.target.value)}/></div>
+                <textarea rows="3" className="chip w-full" value={entry.feedback} onChange={e=>upd('feedback', e.target.value)}></textarea></div>
             </div>
 
             <div className="mt-3 flex gap-2">
@@ -335,7 +338,6 @@
       );
     }
 
-    /* 일지 페이지 */
     function JournalPage({state,setState,stockTab,setStockTab,onEdit}){
       const [q, setQ] = useState('');
       const [sortKey, setSortKey] = useState('date');
@@ -546,8 +548,7 @@
       );
     }
 
-    const root = document.getElementById('root');
-    ReactDOM.createRoot(root).render(<App/>);
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
   </script>
 </body>
 </html>
